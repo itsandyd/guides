@@ -1,29 +1,32 @@
-"use client"
+import React from 'react';
+import TwitchStream from "@/components/twitch/TwitchStreamer";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
-// import SearchUser from '@/components/twitch/SearchTwitchUser';
-// import { db } from '@/lib/db';
-import axios from 'axios';
-import { useSession } from 'next-auth/react';
-import Image from 'next/image';
-import { useState } from 'react';
+import Link from 'next/link'; // Import Link component
+import { Button } from '@/components/ui/Button';
 
-export default function TwitchPage() {
-  const { data: session } = useSession();
-  const [search, setSearch] = useState('');
-
-  if (!session) {
-    return <div>Loading...</div>;
-  }
+const HomePage = () => {
+  const channels = ["1recon11", "neatgangdotcom", "ccsyks"]; // Add your channel names here
 
   return (
-    <div className="flex items-center space-x-4">
-      <Image className="h-10 w-10 rounded-full" src={session?.user?.image || '/placeholder.svg'} alt="User image" width={100} height={100}/>
-      <div>
-        <div className="font-bold">{session.user.name}</div>
-        <div className="text-sm text-gray-500">{session.user.email}</div>
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)} />
-        {/* <SearchUser userId={session.user.id} search={search} /> */}
+    <>
+      <Link href="/twitch/add">
+          <Button variant="outline">Add Stream</Button> {/* Add Button component */}
+      </Link>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        {channels.map((channel, index) => (
+          <Card key={index}>
+            <CardHeader>
+              <CardTitle>{channel}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TwitchStream channel={channel} />
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </div>
+    </>
   );
-}
+};
+
+export default HomePage;

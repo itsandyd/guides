@@ -21,7 +21,10 @@ const Navbar = async () => {
         {/* search bar */}
         {/* <SearchBar /> */}
         <Link href="categories">
-          <Button variant="link">Categories</Button>
+          <Button variant="link">Guide Categories</Button>
+        </Link>
+        <Link href="twitch">
+          <Button variant="link">Streamers</Button>
         </Link>
         <Link href="https://github.com/neatgang/guides">
           <GithubIcon />
