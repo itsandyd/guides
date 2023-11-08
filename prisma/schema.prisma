@@ -51,6 +51,7 @@ model User {
   createdSubreddits Subreddit[]    @relation("CreatedBy")
   subscriptions     Subscription[]
   votes             Vote[]
+  channelName       String? // Add this line
 
   username String? @unique
 

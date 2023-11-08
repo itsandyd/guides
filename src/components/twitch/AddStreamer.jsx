@@ -22,9 +22,20 @@ export function ChannelForm() {
   });
 
   // Define a submit handler
-  const onSubmit = (values) => {
-    // Do something with the form values
-    console.log(values);
+  const onSubmit = async (values) => {
+    const response = await fetch("/api/twitch/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (response.ok) {
+      console.log("Streamer added successfully");
+    } else {
+      console.error("Error adding streamer");
+    }
   };
 
   return (
