@@ -11,7 +11,7 @@ const HomePage = () => {
   return (
     <>
       <Link href="/twitch/add">
-          <Button variant="outline">Add Stream</Button> {/* Add Button component */}
+        <Button className="p-4 mb-4" variant="default">Add Stream</Button> {/* Add Button component */}
       </Link>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         {channels.map((channel, index) => (
