@@ -6,7 +6,7 @@ import Link from 'next/link'; // Import Link component
 import { Button } from '@/components/ui/Button';
 
 const HomePage = () => {
-  const channels = ["1recon11", "neatgangdotcom", "ccsyks", "BooklyTV"]; // Add your channel names here
+  const channels = ["1recon11", "neatgangdotcom", "ccsyks", "BooklyTV", "PrimeTimeRime"]; // Add your channel names here
 
   return (
     <>
