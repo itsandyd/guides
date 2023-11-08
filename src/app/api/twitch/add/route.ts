@@ -1,23 +1,19 @@
 import { db } from '@/lib/db';
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 
+export async function POST(req: NextRequest) {
+  // Parse the request body
+  const body = await req.json();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    // Extract the channel name from the request body
-    const { channelName, userId } = req.body;
+  // Extract the channel name and user ID from the parsed body
+  const { channelName, userId } = body;
 
-    // Use Prisma to add a streamer to the database
-    const streamer = await db.user.update({
-      where: { id: userId },
-      data: { channelName },
-    });
+  // Use Prisma to add a streamer to the database
+  const streamer = await db.user.update({
+    where: { id: userId },
+    data: { channelName },
+  });
 
-    // Send a response back to the client
-    res.status(200).json({ message: 'Streamer added successfully', streamer });
-  } else {
-    // Handle any other HTTP methods
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
+  // Send a response back to the client
+  return NextResponse.json({ message: 'Streamer added successfully', streamer });
 }
