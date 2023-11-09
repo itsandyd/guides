@@ -31,7 +31,8 @@ export function ChannelForm() {
 
       if (response.status === 200) {
         console.log("Streamer added successfully");
-        router.push("/twitch"); // Redirect to /twitch
+        router.push("/twitch");
+        router.refresh; // Redirect to /twitch
       } else {
         console.error("Error adding streamer");
       }
