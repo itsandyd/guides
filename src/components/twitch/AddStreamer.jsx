@@ -5,6 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 // Define the form schema
 const formSchema = z.object({
@@ -22,6 +23,7 @@ export function ChannelForm() {
     },
   });
 
+  const router = useRouter();
   // Define a submit handler
   const onSubmit = async (values) => {
     try {
