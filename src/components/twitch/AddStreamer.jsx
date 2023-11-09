@@ -4,6 +4,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
+import axios from "axios";
 
 // Define the form schema
 const formSchema = z.object({
@@ -23,18 +24,17 @@ export function ChannelForm() {
 
   // Define a submit handler
   const onSubmit = async (values) => {
-    const response = await fetch("/api/twitch/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+    try {
+      const response = await axios.post("/api/twitch/add", values);
 
-    if (response.ok) {
-      console.log("Streamer added successfully");
-    } else {
-      console.error("Error adding streamer");
+      if (response.status === 200) {
+        console.log("Streamer added successfully");
+        router.push("/twitch"); // Redirect to /twitch
+      } else {
+        console.error("Error adding streamer");
+      }
+    } catch (error) {
+      // Handle error
     }
   };
 
@@ -60,8 +60,8 @@ export function ChannelForm() {
         <Button type="submit" className="mt-2">
           Submit
         </Button>{" "}
-        {/* Add margin-top */}
       </form>
     </Form>
   );
+  // };
 }

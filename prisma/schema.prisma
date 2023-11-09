@@ -51,7 +51,7 @@ model User {
   createdSubreddits Subreddit[]    @relation("CreatedBy")
   subscriptions     Subscription[]
   votes             Vote[]
-  channelName       String? // Add this line
+  twitchChannel     TwitchChannel? // Add this line
 
   username String? @unique
 
@@ -143,4 +143,13 @@ model Tag {
   id    String @id @default(cuid())
   name  String @unique
   posts Post[]
+}
+
+model TwitchChannel {
+  id          String @id @default(cuid())
+  channelName String @unique
+  userId      String @unique
+  user        User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }

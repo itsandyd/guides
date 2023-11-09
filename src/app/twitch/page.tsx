@@ -1,30 +1,19 @@
-import React from 'react';
-import TwitchStream from "@/components/twitch/TwitchStreamer";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import React, { useEffect, useState } from 'react';
 
-import Link from 'next/link'; // Import Link component
+import TwitchChannels from "@/components/twitch/TwitchChannels"; // Import TwitchChannels component
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/db';
+import Link from 'next/link';
 
-const HomePage = () => {
-  const channels = ["1recon11", "neatgangdotcom", "ccsyks", "BooklyTV", "PrimeTimeRime"]; // Add your channel names here
+const HomePage = async () => {
+  const channels = await db.twitchChannel.findMany()
 
   return (
     <>
       <Link href="/twitch/add">
         <Button className="p-4 mb-4" variant="default">Add Stream</Button> {/* Add Button component */}
       </Link>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        {channels.map((channel, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <CardTitle>{channel}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TwitchStream channel={channel} />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <TwitchChannels channels={channels} /> {/* Use TwitchChannels component */}
     </>
   );
 };
