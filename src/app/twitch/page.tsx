@@ -8,7 +8,7 @@ import { INFINITE_SCROLL_PAGINATION_RESULTS } from '@/config'
 
 const HomePage = async () => {
   const channels = await db.twitchChannel.findMany({
-  take: INFINITE_SCROLL_PAGINATION_RESULTS, // 4 to demonstrate infinite scroll, should be higher in production
+  // take: INFINITE_SCROLL_PAGINATION_RESULTS, // 4 to demonstrate infinite scroll, should be higher in production
 })
 
   return (
