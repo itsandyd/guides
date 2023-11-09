@@ -4,9 +4,12 @@ import TwitchChannels from "@/components/twitch/TwitchChannels"; // Import Twitc
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import Link from 'next/link';
+import { INFINITE_SCROLL_PAGINATION_RESULTS } from '@/config'
 
 const HomePage = async () => {
-  const channels = await db.twitchChannel.findMany()
+  const channels = await db.twitchChannel.findMany({
+  take: INFINITE_SCROLL_PAGINATION_RESULTS, // 4 to demonstrate infinite scroll, should be higher in production
+})
 
   return (
     <>
