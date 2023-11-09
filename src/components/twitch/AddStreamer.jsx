@@ -6,6 +6,7 @@ import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
 // Define the form schema
 const formSchema = z.object({
@@ -31,7 +32,7 @@ export function ChannelForm() {
 
       if (response.status === 200) {
         console.log("Streamer added successfully");
-        router.push("/twitch");
+        // router.push("/twitch");
         router.refresh; // Redirect to /twitch
       } else {
         console.error("Error adding streamer");
