@@ -1,5 +1,3 @@
-"use client"
-
 import { ChannelForm } from "@/components/twitch/AddStreamer";
 import { authOptions, getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
