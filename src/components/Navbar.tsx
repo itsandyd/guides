@@ -27,6 +27,9 @@ const Navbar = async () => {
         <Link href="categories">
           <Button variant="link">Guide Categories</Button>
         </Link>
+        <Link href="https://emotemaker.ai">
+          <Button variant="link">Emote Maker</Button>
+        </Link>
         <Link href="twitch">
           <Button variant="link">Streamers</Button>
         </Link>
