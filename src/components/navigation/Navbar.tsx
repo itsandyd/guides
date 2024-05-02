@@ -83,7 +83,7 @@ const Navbar = async () => {
     <nav className="p-4 bg-transparent flex items-center justify-between z-10">
     <LandingMobileNavbar />
     <Link href="/" className="flex items-center">
-  <div className='flex items-center gap-2 ml-4'>
+  <div className='flex items-center gap-2'>
     <Book className='h-8 w-8 sm:h-6 sm:w-6 ' />
     <p className=' text-zinc-700 text-sm font-bold'>GuidesForGamers</p>
   </div>
