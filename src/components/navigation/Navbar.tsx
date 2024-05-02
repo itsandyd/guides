@@ -57,7 +57,6 @@
 
 // export default Navbar
 
-"use client";
 
 import { Montserrat } from "next/font/google";
 import Image from "next/image"
@@ -76,7 +75,7 @@ const font = Montserrat({ weight: '600', subsets: ['latin'] });
 
 const Navbar = async () => {
   // const { isSignedIn } = useAuth();
-  // const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions)
 
   return (
     <>
@@ -106,20 +105,16 @@ const Navbar = async () => {
         </Link>
       </div>
       <div className="flex items-center gap-x-2">
-      {/* {session?.user ? ( */}
-    {/* // <Link href="/profile">
-    //     <Button variant="default" className="rounded-full">
-    //         View Profile
-    //     </Button> */}
-        {/* <UserAccountNav user={session.user} /> */}
-    {/* // </Link> */}
-{/* ) : ( */}
+      {session?.user ? (
+
+        <UserAccountNav user={session.user} />
+) : (
     <Link href="/sign-up">
         <Button variant="default" className="rounded-full">
             Get Started
         </Button>
     </Link>
-{/* )} */}
+)}
         {/* <ModeToggle /> */}
         </div>
     </nav>
