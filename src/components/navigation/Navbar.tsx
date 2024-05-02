@@ -58,6 +58,7 @@
 // export default Navbar
 
 
+
 import { Montserrat } from "next/font/google";
 import Image from "next/image"
 import Link from "next/link"
@@ -83,10 +84,11 @@ const Navbar = async () => {
     <LandingMobileNavbar />
     <Link href="/" className="flex items-center">
   <div className='flex items-center gap-2 ml-4'>
-    <Box className='h-8 w-8 sm:h-6 sm:w-6' />
-    <p className='hidden text-zinc-700 text-sm font-medium md:block'>GuidesForGamers</p>
+    <Box className='h-8 w-8 sm:h-6 sm:w-6 ' />
+    <p className=' text-zinc-700 text-sm font-medium'>GuidesForGamers</p>
   </div>
 </Link>
+<div className="hidden md:block">
        <div className="flex items-center gap-x-2">
         <Link href="/categories">
             <Button variant="ghost" className="rounded-full">
@@ -103,6 +105,7 @@ const Navbar = async () => {
                 AI Emote Generation
             </Button>
         </Link>
+      </div>
       </div>
       <div className="flex items-center gap-x-2">
       {session?.user ? (

@@ -1,17 +1,20 @@
 import SubscribeLeaveToggle from '@/components/SubscribeLeaveToggle'
 import ToFeedButton from '@/components/ToFeedButton'
 import { buttonVariants } from '@/components/ui/Button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
 import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { format } from 'date-fns'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ReactNode } from 'react'
 
 export const metadata: Metadata = {
-  title: 'Neat Guides',
-  description: 'Neat Guides for Gamers',
+  title: 'GuidesforGamers',
+  description: 'Guides for Gamers',
+  keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
 const Layout = async ({
@@ -61,7 +64,7 @@ const Layout = async ({
   })
 
   return (
-    <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
+    <div className='sm:container max-w-7xl mx-auto h-full'>
       <div>
         <ToFeedButton />
 
@@ -70,7 +73,49 @@ const Layout = async ({
 
           {/* info sidebar */}
           <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
+            {/* Ad  */}
             <div className='px-6 py-4'>
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle>EmoteMaker.ai</CardTitle>
+                  <CardDescription>Create Custom Emotes in Seconds with EmoteMaker.AI</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Image src="/emotemaker.png" alt="EmoteMaker.ai" width={500} height={500} />
+                </CardContent>
+                <CardFooter>    
+                  <Link
+      className={buttonVariants({
+        variant: 'default',
+        className: 'w-full mb-6',
+      })}
+      href="https://emotemaker.ai">
+      Start Generating Today
+    </Link>
+    </CardFooter>
+              </Card>
+              {/* <p className='font-semibold py-3'>Create Custom Emotes in Seconds with EmoteMaker.AI</p> */}
+              {/* {subreddit.creatorId === session?.user?.id ? ( */}
+              {/* <p className='text-gray-500'>Testing</p> */}
+              {/* <div>
+                <Card>
+                  <img src="/emotemaker.png" alt="EmoteMaker.ai" fill />
+                </Card>
+              </div>
+  <div className='flex justify-between gap-x-4 py-3'>
+    <Link
+      className={buttonVariants({
+        variant: 'default',
+        className: 'w-full mb-6',
+      })}
+      href="https://emotemaker.ai">
+      Start Generating Today
+    </Link>
+  </div> */}
+{/* ) : null} */}
+            </div>
+              {/* Main Info */}
+            <div className='px-6'>
               <p className='font-semibold py-3'>About {subreddit.name}</p>
               {subreddit.creatorId === session?.user?.id ? (
   <div className='flex justify-between gap-x-4 py-3'>

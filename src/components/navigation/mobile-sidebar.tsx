@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Montserrat } from 'next/font/google'
-import { BookIcon, Code, ComputerIcon, ImageIcon, LayoutDashboard, MessageSquare, Music, Settings, UserIcon, VideoIcon } from "lucide-react";
+import { BookIcon, CameraIcon, Code, ComputerIcon, ImageIcon, LayoutDashboard, LibraryIcon, MessageSquare, Music, Paintbrush2, Settings, UserIcon, VideoIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -12,16 +12,22 @@ const poppins = Montserrat ({ weight: '600', subsets: ['latin'] });
 
 const routes = [
     {
-      label: 'Sounds',
-      icon: Music, // Example icon, replace with actual icons as needed
-      href: 'https://sounds.pauseplayrepeat.com',
+      label: 'Guide Categories',
+      icon: LibraryIcon, // Example icon, replace with actual icons as needed
+      href: '/categories',
     },
     {
-      label: 'AI',
-      icon: ComputerIcon, // Example icon
-      href: '/ai/dashboard',
+      label: 'Streamers',
+      icon: CameraIcon, // Example icon
+      href: '/twitch',
+    },
+    {
+      label: 'AI Emote Generation',
+      icon: Paintbrush2, // Example icon
+      href: 'https://emotemaker.ai',
     },
   ];
+
 
 export const LandingMobileSidebar = ({
 }) => {
