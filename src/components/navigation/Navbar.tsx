@@ -70,7 +70,7 @@ import { Button } from "../ui/Button";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { UserAccountNav } from "../UserAccountNav";
-import { Box, BoxIcon } from "lucide-react";
+import { Book, Box, BoxIcon } from "lucide-react";
 
 const font = Montserrat({ weight: '600', subsets: ['latin'] });
 
@@ -84,8 +84,8 @@ const Navbar = async () => {
     <LandingMobileNavbar />
     <Link href="/" className="flex items-center">
   <div className='flex items-center gap-2 ml-4'>
-    <Box className='h-8 w-8 sm:h-6 sm:w-6 ' />
-    <p className=' text-zinc-700 text-sm font-medium'>GuidesForGamers</p>
+    <Book className='h-8 w-8 sm:h-6 sm:w-6 ' />
+    <p className=' text-zinc-700 text-sm font-bold'>GuidesForGamers</p>
   </div>
 </Link>
 <div className="hidden md:block">
