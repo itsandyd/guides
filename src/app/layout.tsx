@@ -1,4 +1,4 @@
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/navigation/Navbar'
 import { cn } from '@/lib/utils'
 import { Inter } from 'next/font/google'
 import Providers from '@/components/Providers'
@@ -27,14 +27,14 @@ export default function RootLayout({
         'bg-white text-slate-900 light',
         inter.className
       )}>
-      <body className='pt-12'>
+      <body className=''>
       {/* bg-slate-50 */}
         <Providers>
           {/* @ts-expect-error Server Component */}
           <Navbar />
           {authModal}
 
-          <div className='container max-w-7xl mx-auto h-full pt-12'>
+          <div className='container max-w-7xl mx-auto h-full p-12'>
             {children}
           </div>
         </Providers>

@@ -6,7 +6,7 @@ const CategoriesPage = async () => {
   const subreddits = await db.subreddit.findMany()
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-12'>
       {subreddits.map((subreddit) => (
         <Link href={`/guides/${subreddit.name}`} key={subreddit.id}>
             <Card>
