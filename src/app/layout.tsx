@@ -5,12 +5,14 @@ import Providers from '@/components/Providers'
 import { Toaster } from '@/components/ui/Toaster'
 
 import '@/styles/globals.css'
+import { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'Neat Guides',
-  description: 'Neat Guides for Gamers',
+export const metadata: Metadata = {
+  title: 'Guides for Gamers - Guidesforgamers.com',
+  description: 'Guides for Gamers is your ultimate resource for video game guides, walkthroughs, tips and tricks. Find detailed step-by-step guides for the latest PC, console and mobile games. Our expert gaming guides help you master gameplay, find all collectibles, earn achievements and get the most out of your gaming experience. Game smarter with Guides for Gamers.',
+  keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
 export default function RootLayout({
