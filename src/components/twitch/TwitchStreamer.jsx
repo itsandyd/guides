@@ -3,7 +3,7 @@ import React from "react";
 const TwitchStream = ({ channel }) => {
   const src = `https://player.twitch.tv/?channel=${encodeURIComponent(
     channel
-  )}&parent=guides.neatgang.com`;
+  )}&parent=guidesforgamers.com`;
 
   return (
     <div
