@@ -74,7 +74,7 @@ const Layout = async ({
           {/* info sidebar */}
           <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
             {/* Ad  */}
-            <div className='px-6 py-4'>
+            <div className=''>
               <Card className="shadow-sm">
                 <CardHeader>
                   <CardTitle>EmoteMaker.ai</CardTitle>
@@ -94,25 +94,6 @@ const Layout = async ({
     </Link>
     </CardFooter>
               </Card>
-              {/* <p className='font-semibold py-3'>Create Custom Emotes in Seconds with EmoteMaker.AI</p> */}
-              {/* {subreddit.creatorId === session?.user?.id ? ( */}
-              {/* <p className='text-gray-500'>Testing</p> */}
-              {/* <div>
-                <Card>
-                  <img src="/emotemaker.png" alt="EmoteMaker.ai" fill />
-                </Card>
-              </div>
-  <div className='flex justify-between gap-x-4 py-3'>
-    <Link
-      className={buttonVariants({
-        variant: 'default',
-        className: 'w-full mb-6',
-      })}
-      href="https://emotemaker.ai">
-      Start Generating Today
-    </Link>
-  </div> */}
-{/* ) : null} */}
             </div>
               {/* Main Info */}
             <div className='px-6'>
