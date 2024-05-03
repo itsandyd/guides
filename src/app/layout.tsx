@@ -36,7 +36,7 @@ export default function RootLayout({
           <Navbar />
           {authModal}
 
-          <div className='container max-w-7xl h-full'>
+          <div className='sm:container max-w-7xl h-full'>
             {children}
           </div>
         </Providers>

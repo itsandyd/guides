@@ -9,12 +9,12 @@ export default function Hero() {
   return (
     <div className="relative w-full h-[400px]">
       {/* <img alt="Hero" className="absolute inset-0 object-cover w-full h-full" src="/placeholder.svg" /> */}
-      <div className="absolute inset-0 flex flex-col justify-center gap-4 p-4 md:gap-10">
+      <div className="absolute inset-0 flex flex-col justify-center gap-4 p-4">
         <div className="grid gap-4">
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-gray-900 dark:text-gray-50">
           Dive into a Universe Where Gamers Fuel Gamers
           </h1>
-          <p className="max-w-[700px] text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400">
           At GuidesForGamers.com, we believe every player has a unique story to share, a clever trick to teach, and a strategy that could change the game. Whether you're battling through the realms of World of Warcraft, mastering skills in Runescape, conquering opponents in League of Legends, or surviving the dark corners of Path of Exile, our community-driven platform is your go-to destination for all things gaming.
           </p>
         </div>

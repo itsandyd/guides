@@ -8,6 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Feed from './feed/page'
 import Hero from '@/components/landing/hero'
+import LatestPosts from '@/components/landing/latest-posts'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -16,8 +17,9 @@ export default async function Home() {
   const session = await getAuthSession()
 
   return (
-    <>
+    <div className='gap-4 mb-12'>
       <Hero />
-    </>
+      <LatestPosts />
+    </div>
   )
 }
