@@ -80,7 +80,6 @@ const CommentVotes: FC<CommentVotesProps> = ({
       {/* upvote */}
       <Button
         onClick={() => vote('UP')}
-        size='xs'
         variant='ghost'
         aria-label='upvote'>
         <ArrowBigUp
@@ -98,7 +97,6 @@ const CommentVotes: FC<CommentVotesProps> = ({
       {/* downvote */}
       <Button
         onClick={() => vote('DOWN')}
-        size='xs'
         className={cn({
           'text-emerald-500': currentVote?.type === 'DOWN',
         })}
