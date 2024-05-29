@@ -86,12 +86,12 @@ const Page = () => {
         <div className='flex justify-end gap-4'>
           <Button
             disabled={isLoading}
-            variant='subtle'
+            variant='destructive'
             onClick={() => router.back()}>
             Cancel
           </Button>
           <Button
-            isLoading={isLoading}
+            // isLoading={isLoading}
             disabled={input.length === 0}
             onClick={() => createCommunity()}>
             Create Category

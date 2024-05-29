@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu'
 import { UserAvatar } from '@/components/UserAvatar'
+import { MessageCircle } from 'lucide-react'
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
   user: Pick<User, 'name' | 'image' | 'email'>
@@ -39,15 +40,18 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href='/'>Feed</Link>
+          <Link href='/feed'>Feed</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href='/guides/create'>Create Community</Link>
+          <Link href='/categories/create'>Create Category</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link href='/settings'>Settings</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href='https://discord.gg/sVPGxbnM'>Join our Discord</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

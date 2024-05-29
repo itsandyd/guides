@@ -63,15 +63,29 @@ model User {
   CommentVote CommentVote[]
 }
 
+model Game {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  subreddits  Subreddit[]
+  gameId      String
+  Tag         Tag?        @relation(fields: [tagId], references: [id])
+  tagId       String?     @unique
+}
+
 model Subreddit {
   id          String         @id @default(cuid())
   name        String         @unique
+  game        Game?          @relation(fields: [gameId], references: [id])
+  gameId      String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  posts       Post[]
+  posts       Post[] // Detailed guides or discussions specific to the game/topic
   description String?
   creatorId   String?
-  Creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
   subscribers Subscription[]
 
   @@index([name])
@@ -98,7 +112,7 @@ model Post {
   subredditId String
   comments    Comment[]
   votes       Vote[]
-  Tag         Tag?      @relation(fields: [tagId], references: [id])
+  tag         Tag?      @relation(fields: [tagId], references: [id])
   tagId       String?
 }
 
@@ -142,6 +156,7 @@ model CommentVote {
 model Tag {
   id    String @id @default(cuid())
   name  String @unique
+  games Game[]
   posts Post[]
 }
 
