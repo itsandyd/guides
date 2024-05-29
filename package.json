@@ -21,12 +21,15 @@
     "@editorjs/paragraph": "^2.9.0",
     "@editorjs/table": "^2.2.1",
     "@hookform/resolvers": "^3.3.2",
+    "@langchain/community": "^0.2.4",
+    "@langchain/groq": "^0.0.12",
     "@mantine/hooks": "^6.0.13",
     "@next-auth/prisma-adapter": "^1.0.6",
     "@prisma/client": "^5.13.0",
+    "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
@@ -46,6 +49,7 @@
     "editorjs-react-renderer": "^3.5.1",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
+    "langchain": "^0.2.3",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.379.0",
     "nanoid": "^4.0.2",
@@ -68,6 +72,7 @@
     "typescript": "5.0.4",
     "uploadthing": "^4.0.0",
     "vaul": "^0.9.0",
+    "ytdl-core": "^4.11.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -76,6 +81,8 @@
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
-    "prisma": "^5.13.0"
+    "prisma": "^5.13.0",
+    "youtube-transcript": "^1.2.1",
+    "youtubei.js": "^9.4.0"
   }
 }
