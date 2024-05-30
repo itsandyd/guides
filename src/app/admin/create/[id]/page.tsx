@@ -5,6 +5,7 @@ import ytdl from "ytdl-core"
 import { db } from "@/lib/db"
 import { Badge } from "@/components/ui/badge"
 import { Embed } from "@/components/admin/YoutubeEmbed"
+import { VerifyFacts } from "@/components/admin/verifyFacts"
 
 type Props = {
     params: { id: string }
@@ -103,7 +104,7 @@ export default async function SummaryIndexPage({ params }: Props) {
             </div>
 
             <div className="flex w-full flex-col gap-10">
-                {/* <VerifyFacts summary={data.summary} /> */}
+                <VerifyFacts summary={data.summary} />
             </div>
         </section>
     )

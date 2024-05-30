@@ -10,6 +10,8 @@ import { db } from "@/lib/db"
 import { formSchema } from "@/components/admin/initialForm"
 import { summarizeTranscriptWithGpt, summarizeTranscriptWithGroq } from "./summarize"
 import { transcribeVideo } from "./transcribe"
+import { VerifyFactsFormSchema } from "@/components/admin/verifyFacts"
+import { searchUsingTavilly } from "./search"
 
 export type FactCheckerResponse = {
     input: "string"
@@ -186,14 +188,14 @@ export const handleInitialFormSubmit = async (
 //     }
 // };
 
-// export const checkFacts = async (
-//     formData: z.infer<typeof VerifyFactsFormSchema>
-// ) => {
-//     try {
-//         const res = await searchUsingTavilly(formData.summary)
-//         return await JSON.parse(res)
-//     } catch (e) {
-//         console.error(e)
-//         return null
-//     }
-// }
+export const checkFacts = async (
+    formData: z.infer<typeof VerifyFactsFormSchema>
+) => {
+    try {
+        const res = await searchUsingTavilly(formData.summary)
+        return await JSON.parse(res)
+    } catch (e) {
+        console.error(e)
+        return null
+    }
+}
