@@ -6,8 +6,9 @@ import { db } from '@/lib/db'
 import { redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
 import { CachedPost } from '@/types/redis'
-import { Post, User, Vote } from '@prisma/client'
+import { Post, Prisma, User, Vote } from '@prisma/client'
 import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
+import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
@@ -17,8 +18,73 @@ interface SubRedditPostPageProps {
   }
 }
 
+interface Block {
+  id: string;
+  data: {
+    text: string;
+  };
+  type: string;
+}
+
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
+
+export async function generateMetadata(
+  { params }: SubRedditPostPageProps,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.postId;
+
+  const post = await db.post.findFirst({
+    where: {
+      id: params.postId,
+    },
+    include: {
+      votes: true,
+      author: true,
+    },
+  });
+
+  if (!post) {
+    return {
+      title: "Post not found",
+      description: "No content available",
+      keywords: ["Subreddit", "Post", "NotFound"],
+      openGraph: {
+        images: [],
+      },
+    };
+  }
+
+  let description = ""; // Define description outside the try block
+
+  function handleContent(content: Prisma.JsonValue) {
+    if (typeof content === 'string') {
+      // Now you can safely use content as a string
+      const contentBlocks = JSON.parse(content);
+      const description = contentBlocks.blocks.map((block: Block) => block.data.text).join(' ').slice(0, 160) + "...";
+      return description;
+    }
+    throw new Error('Content is not a valid JSON string');
+  }
+
+  try {
+    description = handleContent(post.content);
+  } catch (error) {
+    console.error(error);
+    description = "Error processing content"; // Provide a fallback description
+  }
+
+  return {
+    title: post.title.length > 20 ? `${post.title.slice(0, 20)}...` : post.title,
+    description: description,
+    keywords: ["Subreddit Post", post.title, "Reddit", "Discussion"],
+    openGraph: {
+      images: [/* Array of images if available */],
+    },
+  };
+}
+
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   const cachedPost = (await redis.hgetall(

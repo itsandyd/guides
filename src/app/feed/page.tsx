@@ -22,27 +22,27 @@ export default async function Feed() {
 
         {/* subreddit info */}
         <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
-            <div>
-              <Card className="">
-                <CardHeader>
-                  <CardTitle>EmoteMaker.ai</CardTitle>
-                  <CardDescription>Create Custom Emotes in Seconds with EmoteMaker.AI</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Image src="/emotemaker.png" alt="EmoteMaker.ai" width={500} height={500} />
-                </CardContent>
-                <CardFooter>    
-                  <Link
-      className={buttonVariants({
-        variant: 'default',
-        className: 'w-full mb-6',
-      })}
-      href="https://emotemaker.ai">
-      Start Generating Today
-    </Link>
-    </CardFooter>
-              </Card>
-            </div>
+          <div>
+            <Card className="">
+              <CardHeader>
+                <CardTitle>EmoteMaker.ai</CardTitle>
+                <CardDescription>Create Custom Emotes in Seconds with EmoteMaker.AI</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Image src="/emotemaker.png" alt="EmoteMaker.ai" width={500} height={500} />
+              </CardContent>
+              <CardFooter>
+                <Link
+                  className={buttonVariants({
+                    variant: 'default',
+                    className: 'w-full mb-6',
+                  })}
+                  href="https://emotemaker.ai">
+                  Start Generating Today
+                </Link>
+              </CardFooter>
+            </Card>
+          </div>
           <div className='bg-emerald-100 px-6 py-4'>
             <p className='font-semibold py-3 flex items-center gap-1.5'>
               <HomeIcon className='h-4 w-4' />
