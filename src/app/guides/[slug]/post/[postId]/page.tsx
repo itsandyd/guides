@@ -56,31 +56,9 @@ export async function generateMetadata(
     };
   }
 
-  let description = ""; // Define description outside the try block
-
-  function handleContent(content: Prisma.JsonValue): string {
-    if (typeof content !== 'string' || content === null) {
-      console.error("Invalid content type or null content:", content);
-      throw new Error('Content is not a valid or non-null JSON string');
-    }
-  
-    try {
-      const contentBlocks = JSON.parse(content);
-      if (!contentBlocks.blocks) {
-        console.error("Content blocks not found in:", contentBlocks);
-        throw new Error('Content blocks not found');
-      }
-      const description = contentBlocks.blocks.map((block: Block) => block.data.text).join(' ').slice(0, 160) + "...";
-      return description;
-    } catch (error) {
-      console.error("Error parsing content:", content, error);
-      throw new Error('Error parsing JSON content');
-    }
-  }
-
   return {
     title: post.title.length > 20 ? `${post.title.slice(0, 20)}...` : post.title,
-    description: description,
+    description: post.content?.toLocaleString(),
     keywords: ["Subreddit Post", post.title, "Reddit", "Discussion"],
     openGraph: {
       images: [/* Array of images if available */],
