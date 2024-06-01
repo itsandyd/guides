@@ -20,10 +20,18 @@ interface SubRedditPostPageProps {
 
 interface Block {
   id: string;
-  data: {
-    text: string;
-  };
   type: string;
+  data: {
+    text?: string;
+    items?: string[];
+    level?: number;
+  };
+}
+
+interface PostContent {
+  time: number;
+  blocks: Block[];
+  version: string;
 }
 
 export const dynamic = 'force-dynamic'
@@ -56,9 +64,10 @@ export async function generateMetadata(
     };
   }
 
+
   return {
     title: post.title.length > 20 ? `${post.title.slice(0, 20)}...` : post.title,
-    description: post.content?.toLocaleString(),
+    description: post.description || 'Guides for Gamers is your ultimate resource for video game guides, walkthroughs, tips and tricks. Find detailed step-by-step guides for the latest PC, console and mobile games. Our expert gaming guides help you master gameplay, find all collectibles, earn achievements and get the most out of your gaming experience. Game smarter with Guides for Gamers.',
     keywords: ["Subreddit Post", post.title, "Reddit", "Discussion"],
     openGraph: {
       images: [/* Array of images if available */],
