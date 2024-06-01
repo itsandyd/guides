@@ -33,7 +33,7 @@ export async function generateMetadata(
   { params }: SubRedditPostPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.postId;
+  // const id = params.postId;
 
   const post = await db.post.findFirst({
     where: {
@@ -58,21 +58,24 @@ export async function generateMetadata(
 
   let description = ""; // Define description outside the try block
 
-  function handleContent(content: Prisma.JsonValue) {
-    if (typeof content === 'string') {
-      // Now you can safely use content as a string
+  function handleContent(content: Prisma.JsonValue): string {
+    if (typeof content !== 'string' || content === null) {
+      console.error("Invalid content type or null content:", content);
+      throw new Error('Content is not a valid or non-null JSON string');
+    }
+  
+    try {
       const contentBlocks = JSON.parse(content);
+      if (!contentBlocks.blocks) {
+        console.error("Content blocks not found in:", contentBlocks);
+        throw new Error('Content blocks not found');
+      }
       const description = contentBlocks.blocks.map((block: Block) => block.data.text).join(' ').slice(0, 160) + "...";
       return description;
+    } catch (error) {
+      console.error("Error parsing content:", content, error);
+      throw new Error('Error parsing JSON content');
     }
-    throw new Error('Content is not a valid JSON string');
-  }
-
-  try {
-    description = handleContent(post.content);
-  } catch (error) {
-    console.error(error);
-    description = "Error processing content"; // Provide a fallback description
   }
 
   return {
@@ -136,7 +139,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             {post?.title ?? cachedPost.title}
           </h1>
 
-          <EditorOutput content={post?.content ?? cachedPost.content} />
+          <EditorOutput content={post?.content ?? cachedPost.content} onChange={post?.onChange}/>
           <Suspense
             fallback={
               <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
