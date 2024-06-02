@@ -190,8 +190,8 @@ model TwitchChannel {
 model Video {
   id         String    @id @default(cuid())
   videoid    String    @unique
-  videotitle String    @db.VarChar(255) // Increased length
-  transcript String    @db.Text // Use Text for potentially long strings
+  videotitle String    @db.Text
+  transcript String    @db.LongText // Use Text for potentially long strings
   created_at DateTime  @default(now())
   summaries  Summary[]
 }
