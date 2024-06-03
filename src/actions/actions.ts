@@ -19,6 +19,8 @@ export type FactCheckerResponse = {
     text: string
 }
 
+export const runtime = 'edge'; 
+
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>
 ) => {
