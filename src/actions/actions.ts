@@ -1,6 +1,5 @@
-
-
 "use server"
+
 import { revalidatePath } from "next/cache"
 import { type MessageContent } from "@langchain/core/messages"
 import ytdl from "ytdl-core"
@@ -20,6 +19,7 @@ export type FactCheckerResponse = {
     text: string
 }
 
+export const maxDuration = 60;
 
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>

@@ -44,21 +44,21 @@ export const InitialForm = () => {
             <form
                 className="flex w-full flex-col items-start gap-2 md:flex-row"
                 onSubmit={form.handleSubmit(async (data) => {
+                    toast.info("Processing your request...");
                     await handleInitialFormSubmit(data).then(
                         (value: string | null) => {
                             if (value) {
-                                toast.info("Redirecting...")
-
-                                return router.push(`/admin/create/${value}`)
+                                toast.info("Redirecting...");
+                                router.push(`/admin/create/${value}`);
+                            } else {
+                                toast.error("An Error Occurred while Generating the Summary.");
+                                router.refresh();
                             }
-
-                            toast.error(
-                                "An Error Occurred while Generating the Summary."
-                            )
-
-                            return router.refresh()
                         }
-                    )
+                    ).catch(error => {
+                        console.error("Submission Error:", error);
+                        toast.error("Failed to process your request. Please try again.");
+                    });
                 })}
             >
                 <div className="flex w-full gap-2 md:max-w-2xl">
