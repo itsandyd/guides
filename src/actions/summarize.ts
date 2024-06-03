@@ -4,8 +4,8 @@ import { ChatGroq } from "@langchain/groq"
 import { ChatOpenAI } from "@langchain/openai"
 import { TokenTextSplitter } from "langchain/text_splitter"
 
-export const maxDuration = 60; // This function can run for a maximum of 5 seconds
-export const dynamic = 'force-dynamic';
+// export const maxDuration = 60; // This function can run for a maximum of 5 seconds
+// export const dynamic = 'force-dynamic';
 
 export const summarizeTranscriptWithGroq = async (
     transcript: string,

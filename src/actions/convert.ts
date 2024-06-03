@@ -5,7 +5,7 @@ import FormData from "form-data"
 import fetch from "node-fetch"
 import ytdl from "ytdl-core"
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 export const uploadAndTranscribe = async (link: string) => {
     try {

@@ -4,7 +4,6 @@ import { uploadAndTranscribe } from "./convert"
 
 // import { uploadAndTranscribe } from "@/lib/core/convert"
 
-export const runtime = 'edge'
 
 export const transcribeVideo = async (link: string) => {
     const loader = YoutubeLoader.createFromUrl(link, { addVideoInfo: true })
