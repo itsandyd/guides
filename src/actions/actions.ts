@@ -19,8 +19,6 @@ export type FactCheckerResponse = {
     text: string
 }
 
-export const maxDuration = 60;
-
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>
 ) => {
