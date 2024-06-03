@@ -18,6 +18,8 @@ import { Input } from "../ui/Input"
 import { Badge } from "../ui/badge"
 import { handleInitialFormSubmit } from "@/actions/actions"
 
+export const runtime = "edge"
+
 export const formSchema = z.object({
     link: z.string().describe("The YouTube Video you would like to summarize."),
     model: z.enum([
