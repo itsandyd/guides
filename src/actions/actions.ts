@@ -20,6 +20,7 @@ export type FactCheckerResponse = {
     text: string
 }
 
+
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>
 ) => {
