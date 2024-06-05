@@ -67,9 +67,6 @@ export async function generateMetadata(
     };
   }
 
-  // Log the tags to the console
-  console.log("Tags for post:", post.tags.map(t => t.tag.name));
-
   const tagNames = post.tags.map(postTag => postTag.tag.name).join(', ');
 
   return {
