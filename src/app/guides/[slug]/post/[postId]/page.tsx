@@ -50,6 +50,7 @@ export async function generateMetadata(
     include: {
       votes: true,
       author: true,
+      tag: true,
     },
   });
 
@@ -68,7 +69,7 @@ export async function generateMetadata(
   return {
     title: post.title.length > 60 ? `${post.title.slice(0, 60)}...` : post.title,
     description: post.description || 'Guides for Gamers is your ultimate resource for video game guides, walkthroughs, tips and tricks. Find detailed step-by-step guides for the latest PC, console and mobile games. Our expert gaming guides help you master gameplay, find all collectibles, earn achievements and get the most out of your gaming experience. Game smarter with Guides for Gamers.',
-    keywords: ["Subreddit Post", post.title, "Reddit", "Discussion"],
+    keywords: post.tag?.name, 
     openGraph: {
       images: [/* Array of images if available */],
     },
