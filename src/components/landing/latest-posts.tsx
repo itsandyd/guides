@@ -7,17 +7,23 @@ import Link from 'next/link';
 import { Card, CardHeader, CardTitle } from '../ui/Card';
 import { cn } from '@/lib/utils';
 
+type Tag = {
+  tagId: string;
+};
+
+// Adjust the Post type
 type Post = {
   id: string;
   title: string;
-  content: any;
+  content: any; // Adjust according to your actual content type
   createdAt: Date;
   updatedAt: Date;
   authorId: string;
   subredditId: string;
-  tagId: string | null;
+  tags: Tag[]; // Use the Tag type here
 };
 
+// Adjust the LatestPost type
 type LatestPost = {
   subredditName: string;
   latestPosts: Post[];
