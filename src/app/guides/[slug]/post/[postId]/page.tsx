@@ -41,8 +41,6 @@ export async function generateMetadata(
   { params }: SubRedditPostPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // const id = params.postId;
-
   const post = await db.post.findFirst({
     where: {
       id: params.postId,
@@ -50,7 +48,11 @@ export async function generateMetadata(
     include: {
       votes: true,
       author: true,
-      tag: true,
+      tags: { // Correctly include tags through the PostTag relation
+        include: {
+          tag: true
+        }
+      }
     },
   });
 
@@ -65,11 +67,15 @@ export async function generateMetadata(
     };
   }
 
+  // Log the tags to the console
+  console.log("Tags for post:", post.tags.map(t => t.tag.name));
+
+  const tagNames = post.tags.map(postTag => postTag.tag.name).join(', ');
 
   return {
     title: post.title.length > 60 ? `${post.title.slice(0, 60)}...` : post.title,
     description: post.description || 'Guides for Gamers is your ultimate resource for video game guides, walkthroughs, tips and tricks. Find detailed step-by-step guides for the latest PC, console and mobile games. Our expert gaming guides help you master gameplay, find all collectibles, earn achievements and get the most out of your gaming experience. Game smarter with Guides for Gamers.',
-    keywords: post.tag?.name, 
+    keywords: tagNames,
     openGraph: {
       images: [/* Array of images if available */],
     },

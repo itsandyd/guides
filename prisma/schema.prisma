@@ -120,13 +120,11 @@ model Post {
   subredditId String
   comments    Comment[]
   votes       Vote[]
-  tag         Tag?      @relation(fields: [tagId], references: [id])
-  tagId       String?
+  tags        PostTag[] // Relation to PostTag for many-to-many relationship
   slug        String?
 
   @@index([authorId])
   @@index([subredditId])
-  @@index([tagId])
 }
 
 model Comment {
@@ -174,10 +172,21 @@ model CommentVote {
 }
 
 model Tag {
-  id    String @id @default(cuid())
-  name  String @unique
+  id    String    @id @default(cuid())
+  name  String    @unique
   games Game[]
-  posts Post[]
+  posts PostTag[] // Relation to PostTag for many-to-many relationship
+}
+
+// New model to represent the many-to-many relationship
+model PostTag {
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+  tag    Tag    @relation(fields: [tagId], references: [id])
+  tagId  String
+
+  @@id([postId, tagId]) // Composite primary key
+  @@index([tagId])
 }
 
 model TwitchChannel {
