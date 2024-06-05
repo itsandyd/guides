@@ -72,10 +72,11 @@ model Game {
   description String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  parentId    String?     @unique
+  parent      Game?       @relation("GameHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    Game[]      @relation("GameHierarchy")
   subreddits  Subreddit[]
-  gameId      String
-  Tag         Tag?        @relation(fields: [tagId], references: [id])
-  tagId       String?     @unique
+  tags        Tag[]
 }
 
 model Subreddit {
@@ -121,6 +122,7 @@ model Post {
   votes       Vote[]
   tag         Tag?      @relation(fields: [tagId], references: [id])
   tagId       String?
+  slug        String?
 
   @@index([authorId])
   @@index([subredditId])

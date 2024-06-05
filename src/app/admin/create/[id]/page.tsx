@@ -1,3 +1,5 @@
+// "use client"
+
 import type { Metadata, ResolvingMetadata } from "next"
 import { Eye, Tv } from "lucide-react"
 import ytdl from "ytdl-core"
@@ -6,46 +8,48 @@ import { db } from "@/lib/db"
 import { Badge } from "@/components/ui/badge"
 import { Embed } from "@/components/admin/YoutubeEmbed"
 import { VerifyFacts } from "@/components/admin/verifyFacts"
+import axios from "axios"
+import { Button } from "@/components/ui/Button"
+import CreatePost from "@/components/admin/createPost"
+import { Editor } from "@/components/Editor"
 
 type Props = {
     params: { id: string }
 }
 
-export async function generateMetadata(
-    { params }: Props,
-    parent: ResolvingMetadata
-): Promise<Metadata> {
-    const id = params.id
+// export async function generateMetadata(
+//     { params }: Props,
+//     parent: ResolvingMetadata
+// ): Promise<Metadata> {
+//     const id = params.id
+//     const data = await db.summary.findFirst({
+//         where: { videoid: id }
+//     });
+//     const videoInfo = await ytdl.getInfo(data?.videoid ?? "");
 
-    const data = await db.summary.findFirst({
-        where: { videoid: id }
-    });
-
-    const videoInfo = await ytdl.getInfo(data?.videoid ?? "");
-
-    return {
-        title:
-            videoInfo.videoDetails.title.length > 20
-                ? videoInfo.videoDetails.title.slice(0, 20).concat("...")
-                : videoInfo.videoDetails.title,
-        description: data?.summary?.slice(0, 100).concat("..."),
-        keywords: [
-            "YouTube Summary",
-            "Video Summary",
-            "Summary",
-            videoInfo.videoDetails.title,
-            videoInfo.videoDetails.author.name,
-        ],
-        openGraph: {
-            images: [videoInfo.videoDetails.thumbnails.reverse()[0].url],
-        },
-    }
-}
+//     return {
+//         title: videoInfo.videoDetails.title.length > 20
+//                 ? videoInfo.videoDetails.title.slice(0, 20).concat("...")
+//                 : videoInfo.videoDetails.title,
+//         description: data?.summary?.slice(0, 100).concat("..."),
+//         keywords: [
+//             "YouTube Summary",
+//             "Video Summary",
+//             "Summary",
+//             videoInfo.videoDetails.title,
+//             videoInfo.videoDetails.author.name,
+//         ],
+//         openGraph: {
+//             images: [videoInfo.videoDetails.thumbnails.reverse()[0].url],
+//         },
+//     }
+// }
 
 export default async function SummaryIndexPage({ params }: Props) {
     const data = await db.summary.findFirst({
         where: { videoid: params.id }
     });
+    
 
     if (!data) {
         return (
@@ -63,6 +67,19 @@ export default async function SummaryIndexPage({ params }: Props) {
             </section>
         )
     }
+
+    const handleCreatePost = async () => {
+        try {
+            const response = await axios.post('/api/subreddit/post/create', {
+                title: videoInfo.videoDetails.title,
+                content: data.summary,
+                subredditId: 'your-subreddit-id' // You need to specify the subreddit ID
+            });
+            console.log('Post created:', response.data);
+        } catch (error) {
+            console.error('Error creating post:', error);
+        }
+    };
 
     const videoInfo = await ytdl.getInfo(data.videoid ?? "");
 
@@ -94,18 +111,41 @@ export default async function SummaryIndexPage({ params }: Props) {
                                     <Eye className="mr-2 size-3" /> {videoInfo.videoDetails.viewCount}
                                 </Badge>
                             </div>
+    {/* <Button onClick={handleCreatePost}>Create Post</Button> */}
                         </div>
                     </div>
                 </div>
-                <div className="flex w-full flex-col items-start gap-5 rounded-xl p-5 text-justify outline-dashed outline-2 outline-secondary md:text-left">
+                {/* <div className="flex w-full flex-col items-start gap-5 rounded-xl p-5 text-justify outline-dashed outline-2 outline-secondary md:text-left">
                     {data.summary}
-                    {/* <RegenerateSummaryButton videoid={data.videoid} /> */}
-                </div>
+                    <RegenerateSummaryButton videoid={data.videoid} />
+                </div> */}
+                <Editor
+                    // subredditId={subredditId}
+                    content={data.summary}
+                    title={videoInfo.videoDetails.title}
+                    description={videoInfo.videoDetails.description || ""}
+                    author={videoInfo.videoDetails.author.name}
+                    thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
+                />
             </div>
 
             <div className="flex w-full flex-col gap-10">
+            <CreatePost
+    title={videoInfo.videoDetails.title}
+    content={data.summary}
+    description={videoInfo.videoDetails.description || ""}
+    author={videoInfo.videoDetails.author.name}
+    thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
+/>
                 <VerifyFacts summary={data.summary} />
             </div>
+            <div className="mb-8">
+            <div className='w-full flex justify-end'>
+        <Button type='submit' className='w-full' form='subreddit-post-form'>
+          Post
+        </Button>
+      </div>
+      </div>
         </section>
     )
 }

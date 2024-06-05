@@ -11,13 +11,6 @@ const nextConfig = {
   experimental: {
     appDir: true,
     serverActions: true,
-    runtime: "nodejs",
-  },
-  serverRuntimeConfig: {
-    maxDuration: 60, // Set the maximum duration to 5 seconds
-  },
-  dynamicParams: {
-    forceDynamic: true, // Enable force-dynamic rendering
   },
 };
 

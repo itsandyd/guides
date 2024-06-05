@@ -16,3 +16,8 @@ export const searchResponseSchema = z.object({
             "An extra information or correct information about the video based on the Internet source."
         ),
 })
+
+export const CreatePostFormSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    content: z.string().min(20, "Content must be at least 20 characters long"),
+});
