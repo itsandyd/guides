@@ -39,7 +39,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, des
       subredditId,
       title: title || '',
       content: content || null,
-      tags: [],
+      // tags: [],
     },
   });
 
@@ -60,9 +60,9 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, des
       title,
       content,
       subredditId,
-      tags,
+      // tags,
     }: PostCreationRequest) => {
-      const payload: PostCreationRequest = { title, content, subredditId, tags }
+      const payload: PostCreationRequest = { title, content, subredditId }
       const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
@@ -187,7 +187,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, des
       title: data.title,
       content: blocks,
       subredditId: '',
-      tags: data.tags,
+      // tags: data.tags,
     }
 
     createPost(payload)
