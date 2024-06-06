@@ -44,7 +44,7 @@ const page = async ({ params }: PageProps) => {
       <MiniCreatePost session={session} />
       <PostFeed initialPosts={subreddit.posts} subredditName={subreddit.name} />
     </>
-  )
+)
 }
 
 export default page
