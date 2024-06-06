@@ -19,7 +19,7 @@ import '@/styles/editor.css'
 type FormData = z.infer<typeof PostValidator>
 
 interface EditorProps {
-  subredditId?: string
+  subredditId: string
   title?: string
   content?: string
   description?: string
@@ -27,7 +27,7 @@ interface EditorProps {
   thumbnail?: string
 }
 
-export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, description, author, thumbnail }) => {
+export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
   const {
     register,
     handleSubmit,
@@ -37,17 +37,17 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, des
     resolver: zodResolver(PostValidator),
     defaultValues: {
       subredditId,
-      title: title || '',
-      content: content || null,
+      title: '',
+      content: null,
       // tags: [],
     },
   });
 
-  useEffect(() => {
-    if (content) {
-      setValue('content', content);
-    }
-  }, [content, setValue]);
+  // useEffect(() => {
+  //   if (content) {
+  //     setValue('content', content);
+  //   }
+  // }, [content, setValue]);
 
   const ref = useRef<EditorJS>()
   const _titleRef = useRef<HTMLTextAreaElement>(null)
@@ -186,7 +186,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, title, content, des
     const payload: PostCreationRequest = {
       title: data.title,
       content: blocks,
-      subredditId: '',
+      subredditId,
       // tags: data.tags,
     }
 

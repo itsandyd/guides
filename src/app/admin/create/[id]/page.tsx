@@ -119,14 +119,14 @@ export default async function SummaryIndexPage({ params }: Props) {
                     {data.summary}
                     <RegenerateSummaryButton videoid={data.videoid} />
                 </div> */}
-                <Editor
-                    // subredditId={subredditId}
+                {/* <Editor
+                    subredditId={subredditId}
                     content={data.summary}
                     title={videoInfo.videoDetails.title}
                     description={videoInfo.videoDetails.description || ""}
                     author={videoInfo.videoDetails.author.name}
                     thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
-                />
+                /> */}
             </div>
 
             <div className="flex w-full flex-col gap-10">
