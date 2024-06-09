@@ -2,6 +2,9 @@
   "functions": {
     "pages/api/**/*": {
       "maxDuration": 600 
+    },
+    "api/admin/create": {
+      "maxDuration": 300
     }
   }
 }
