@@ -5,6 +5,9 @@
     },
     "api/admin/create": {
       "maxDuration": 300
+    },
+    "admin/create/page.tsx": {
+      "maxDuration": 300
     }
   }
 }
