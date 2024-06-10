@@ -1,3 +1,4 @@
+import { maxDuration } from './../app/admin/create/page';
 "use server"
 
 import { revalidatePath } from "next/cache"
@@ -27,6 +28,12 @@ export const handleInitialFormSubmit = async (
     try {
         const videoInfo = await ytdl.getInfo(formData.link)
         const videoId = videoInfo.videoDetails.videoId
+        const videoTitle = videoInfo.videoDetails.title;
+        const videoDescription = videoInfo.videoDetails.description || "No description available"; 
+
+// Include title and description in the transcription
+const transcription = await transcribeVideo(formData.link);
+const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcription}`;
 
         const existingVideo = await db.video.findUnique({
             where: {
@@ -51,9 +58,11 @@ export const handleInitialFormSubmit = async (
                 formData.model == "gpt-4o"
             ) {
                 summary = await summarizeTranscriptWithGpt(
-                    existingVideo.transcript!,
-                    formData.model
-                )
+                    enhancedTranscription,
+                    formData.model,
+                    videoTitle, // Pass this argument
+                    videoDescription // Pass this argument
+                );
             } else {
                 summary = await summarizeTranscriptWithGroq(
                     existingVideo.transcript!,
@@ -91,9 +100,11 @@ export const handleInitialFormSubmit = async (
         let summary: MessageContent | null = null
         if (formData.model == "gpt-3.5-turbo" || formData.model == "gpt-4o") {
             summary = await summarizeTranscriptWithGpt(
-                transcript,
-                formData.model
-            )
+                enhancedTranscription,
+                formData.model,
+                videoTitle, // Pass this argument
+                videoDescription // Pass this argument
+            );
         } else {
             summary = await summarizeTranscriptWithGroq(
                 transcript,
@@ -126,6 +137,8 @@ export const handleInitialFormSubmit = async (
         revalidatePath("/summaries")
     }
 }
+
+handleInitialFormSubmit.maxDuration = 600;
 
 // export const handleRegenerateSummary = async (
 //     formData: z.infer<typeof RegenerateFormSchema>

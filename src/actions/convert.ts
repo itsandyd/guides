@@ -64,6 +64,8 @@ export const uploadAndTranscribe = async (link: string) => {
     }
 }
 
+uploadAndTranscribe.maxDuration = 600;
+
 const streamToBuffer = (stream: any): Promise<Buffer> => {
     return new Promise((resolve, reject) => {
         const chunks: Buffer[] = []

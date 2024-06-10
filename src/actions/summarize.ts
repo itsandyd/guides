@@ -76,8 +76,10 @@ export const summarizeTranscriptWithGroq = async (
 }
 
 export const summarizeTranscriptWithGpt = async (
-    transcript: string,
-    model: "gpt-3.5-turbo" | "gpt-4o"
+    enhancedTranscription: string, 
+    model: "gpt-3.5-turbo" | "gpt-4o",
+    videoTitle: string, // Add this line
+    videoDescription: string // Add this line
 ) => {
     const splitter = new TokenTextSplitter({
         encodingName: "gpt2",
@@ -91,7 +93,7 @@ export const summarizeTranscriptWithGpt = async (
     })
 
     try {
-        const outputs = await splitter.createDocuments([transcript])
+        const outputs = await splitter.createDocuments([enhancedTranscription])
 
         const summaryPromises = outputs.map(
             async (output: { pageContent: string }) => {
@@ -122,11 +124,10 @@ export const summarizeTranscriptWithGpt = async (
         const prompt = ChatPromptTemplate.fromMessages([
             [
                 "system",
-                // "You are a highly skilled AI trained in language comprehension and summarization. I would like you to read the following array of concise description generated from sub-sections of a transcript from a youtube video; summarize it into a concise abstract paragraph. Aim to retain the most important points, providing a coherent and readable summary that could help a person understand the main points of the video without needing to read the entire text. Please avoid unnecessary details or tangential points. The output should only be in English language.",
-                "You are a highly skilled AI trained in SEO blog writing. Your task is to write an in-depth, SEO-optimized blog post based on the search results provided, following these steps: Carefully review the search results to identify the main topic and key points to cover in the blog post. Look for common themes, important facts and statistics, and authoritative sources to cite. Create an outline for a comprehensive blog post on the topic, organizing it into logical sections with descriptive headings. Aim for a clear introduction, detailed body paragraphs covering each key point, and a conclusion that summarizes the main takeaways. Write the blog post section by section, incorporating relevant information from the search results. Put key facts in context and provide in-depth explanations where needed. Aim for at least 1500 words of unique, valuable content. Organically integrate primary and related keywords from your research throughout the post to optimize for search engines. Include the main keyword in the title, headings, introduction, and conclusion. Follow SEO best practices like using short paragraphs, bulleted lists, images with descriptive alt text, and internal and external links to authoritative sources. Cite sources using brackets, e.g., [1]. Ensure the writing style is engaging, easy to understand, and matches the search intent. Use transition words for coherence. Provide actionable advice, opinions, or analysis that offers unique value beyond the search results. Conclude with a strong call-to-action or final thought that satisfies the reader. Avoid fluff or repetition. Proofread and edit the final draft for clarity, accuracy, grammar, and readability before publishing. The blog post should demonstrate expertise on the topic and be the best resource available to a reader searching for information about this subject."
+                `You are a highly skilled AI trained in SEO blog writing. Based on the provided YouTube video titled "${videoTitle}" with the description "${videoDescription}", create an in-depth, SEO-optimized blog post.`
             ],
             ["human", summaries.join()],
-        ])
+        ]);
 
         const chain = prompt.pipe(gpt)
         const res = await chain.invoke({})
