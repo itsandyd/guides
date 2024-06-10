@@ -3,9 +3,6 @@
     "pages/api/**/*": {
       "maxDuration": 300 
     },
-    "api/admin/create": {
-      "maxDuration": 300
-    },
     "src/app/admin/create/page.tsx": {
       "maxDuration": 300
     }
