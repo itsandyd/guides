@@ -64,7 +64,7 @@ export const uploadAndTranscribe = async (link: string) => {
     }
 }
 
-uploadAndTranscribe.maxDuration = 600;
+uploadAndTranscribe.maxDuration = 300;
 
 const streamToBuffer = (stream: any): Promise<Buffer> => {
     return new Promise((resolve, reject) => {

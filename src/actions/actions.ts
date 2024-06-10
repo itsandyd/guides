@@ -138,7 +138,7 @@ const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcripti
     }
 }
 
-handleInitialFormSubmit.maxDuration = 600;
+handleInitialFormSubmit.maxDuration = 300;
 
 // export const handleRegenerateSummary = async (
 //     formData: z.infer<typeof RegenerateFormSchema>
