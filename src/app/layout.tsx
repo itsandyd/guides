@@ -32,7 +32,8 @@ export default function RootLayout({
       <body className=''>
       {/* bg-slate-50 */}
         <Providers>
-          {/* <Navbar /> */}
+          {/* @ts-expect-error Server Component */}
+          <Navbar />
           {authModal}
 
           <div className='h-full'>
