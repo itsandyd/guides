@@ -21,18 +21,18 @@ export const metadata: Metadata = {
     applicationName: 'GuideCraft by GuidesforGamers',
     authors: [{ name: 'GuidesforGamers Team', url: 'https://guidesforgamers.com' }],
     generator: 'Next.js',
-    themeColor: '#1a1a1d', // Dark, gaming-oriented color scheme
+    themeColor: '#1a1a1d',
     colorScheme: 'dark',
     viewport: 'width=device-width, initial-scale=1',
     creator: 'GuidesforGamers Development Team',
-    publisher: 'GuidesforGamers.',
-    robots: 'index, follow', // Allows search engines to index the page and follow links
+    publisher: 'GuidesforGamers',
+    robots: 'index, follow',
     alternates: {
       canonical: 'https://guidesforgamers.com/guidecraft',
     },
     icons: {
-      icon: '/favicon.ico', // Relative path to the favicon
-      apple: '/apple-touch-icon.png', // Path to the Apple touch icon
+      icon: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
     },
     manifest: '/site.webmanifest',
     openGraph: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       siteName: 'GuidesforGamers',
       images: [
         {
-          url: 'https://guidesforgamers.com/guidecraft/og-image.jpg', // URL to the Open Graph image
+          url: 'https://guidesforgamers.com/guidecraft/og-image.jpg',
           width: 1200,
           height: 630,
           alt: 'GuideCraft - Convert YouTube Videos into Written Guides by GuidesforGamers',
@@ -61,7 +61,6 @@ export const metadata: Metadata = {
     verification: {
       google: 'YOUR_GOOGLE_VERIFICATION_CODE',
       yandex: 'YOUR_YANDEX_VERIFICATION_CODE',
-    //   bing: 'YOUR_BING_VERIFICATION_CODE',
     },
     appleWebApp: {
       capable: true,
@@ -69,10 +68,10 @@ export const metadata: Metadata = {
       statusBarStyle: 'black-translucent',
     },
     formatDetection: {
-      telephone: false, // Disables automatic linking of phone numbers
+      telephone: false,
     },
     category: 'Gaming, Content Creation, SEO',
-  };
+};
   
 
 export default async function Home() {
