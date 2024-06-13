@@ -37,7 +37,7 @@ export default function Component() {
         </div>
       </header>
       <main className="flex-1">
-        <section className="py-12 md:py-16 lg:py-20 xl:py-24">
+        {/* <section className="py-12 md:py-16 lg:py-20 xl:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
               <div>
@@ -149,6 +149,60 @@ export default function Component() {
               </div>
             </div>
           </div>
+        </section> */}
+         <section className="py-12 md:py-16 lg:py-20 xl:py-24">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-extrabold tracking-tighter sm:text-4xl md:text-5xl font-montserrat">
+                Why Choose Guides for Gamers?
+              </h2>
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
+                  <ClockIcon className="h-8 w-8" />
+                </div>
+                <h3 className="mt-4 text-lg font-bold font-montserrat">Save Countless Hours</h3>
+                <p className="mt-2 text-gray-300 font-roboto">
+                  Transform your videos into written guides in minutes, not hours. Our platform streamlines the process,
+                  saving you valuable time and effort.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
+                  <RecycleIcon className="h-8 w-8" />
+                </div>
+                <h3 className="mt-4 text-lg font-bold font-montserrat">Repurpose Your Video Content</h3>
+                <p className="mt-2 text-gray-300 font-roboto">
+                  Maximize the value of your existing YouTube videos by repurposing them into professional written
+                  guides, reaching a broader audience and increasing engagement.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
+                  <RocketIcon className="h-8 w-8" />
+                </div>
+                <h3 className="mt-4 text-lg font-bold font-montserrat">Rank Higher on Google</h3>
+                <p className="mt-2 text-gray-300 font-roboto">
+                  Our platform ensures that your written guides are optimized for search engines, boosting your
+                  visibility and helping you reach more gamers.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
+                  <BriefcaseIcon className="h-8 w-8" />
+                </div>
+                <h3 className="mt-4 text-lg font-bold font-montserrat">Professional-Grade Quality</h3>
+                <p className="mt-2 text-gray-300 font-roboto">
+                  Elevate your content with sleek, modern written guides that match the professional quality of your
+                  YouTube videos, enhancing your brand and credibility.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex h-16/></div></div></div></section></main></div>); }/></></></></></></>);&#xA;}&#xA;" />
+              </div>
+            </div>
+          </div>
         </section>
         <section className="bg-gray-800 py-12 md:py-16 lg:py-20 xl:py-24">
           <div className="container mx-auto px-4 md:px-6">
@@ -223,7 +277,7 @@ export default function Component() {
             </div>
           </div>
         </section>
-        <section className="py-12 md:py-16 lg:py-20 xl:py-24">
+        {/* <section className="py-12 md:py-16 lg:py-20 xl:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-extrabold tracking-tighter sm:text-4xl md:text-5xl font-montserrat">
@@ -247,61 +301,7 @@ export default function Component() {
               </form>
             </div>
           </div>
-        </section>
-        <section className="py-12 md:py-16 lg:py-20 xl:py-24">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-extrabold tracking-tighter sm:text-4xl md:text-5xl font-montserrat">
-                Why Choose Guides for Gamers?
-              </h2>
-            </div>
-            <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
-                  <ClockIcon className="h-8 w-8" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold font-montserrat">Save Countless Hours</h3>
-                <p className="mt-2 text-gray-300 font-roboto">
-                  Transform your videos into written guides in minutes, not hours. Our platform streamlines the process,
-                  saving you valuable time and effort.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
-                  <RecycleIcon className="h-8 w-8" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold font-montserrat">Repurpose Your Video Content</h3>
-                <p className="mt-2 text-gray-300 font-roboto">
-                  Maximize the value of your existing YouTube videos by repurposing them into professional written
-                  guides, reaching a broader audience and increasing engagement.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
-                  <RocketIcon className="h-8 w-8" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold font-montserrat">Rank Higher on Google</h3>
-                <p className="mt-2 text-gray-300 font-roboto">
-                  Our platform ensures that your written guides are optimized for search engines, boosting your
-                  visibility and helping you reach more gamers.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-indigo-500">
-                  <BriefcaseIcon className="h-8 w-8" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold font-montserrat">Professional-Grade Quality</h3>
-                <p className="mt-2 text-gray-300 font-roboto">
-                  Elevate your content with sleek, modern written guides that match the professional quality of your
-                  YouTube videos, enhancing your brand and credibility.
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16/></div></div></div></section></main></div>); }/></></></></></></>);&#xA;}&#xA;" />
-              </div>
-            </div>
-          </div>
-        </section>
+        </section> */}
       </main>
     </div>
   )
