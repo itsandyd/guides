@@ -8,8 +8,9 @@ import { TokenTextSplitter } from "langchain/text_splitter"
 // export const dynamic = 'force-dynamic';
 
 export const summarizeTranscriptWithGroq = async (
-    transcript: string,
-    model: "llama3-70b-8192" | "mixtral-8x7b-32768" | "gemma-7b-it"
+    enhancedTranscription: string,
+    model: string,
+    additionalContext: string // New parameter
 ) => {
     const splitter = new TokenTextSplitter({
         encodingName: "gpt2",
@@ -26,7 +27,7 @@ export const summarizeTranscriptWithGroq = async (
     })
 
     try {
-        const outputs = await splitter.createDocuments([transcript])
+        const outputs = await splitter.createDocuments([enhancedTranscription])
 
         const summaryPromises = outputs.map(
             async (output: { pageContent: string }) => {
@@ -78,8 +79,9 @@ export const summarizeTranscriptWithGroq = async (
 export const summarizeTranscriptWithGpt = async (
     enhancedTranscription: string, 
     model: "gpt-3.5-turbo" | "gpt-4o",
-    videoTitle: string, // Add this line
-    videoDescription: string // Add this line
+    videoTitle: string,
+    videoDescription: string,
+    additionalContext: string // New parameter
 ) => {
     const splitter = new TokenTextSplitter({
         encodingName: "gpt2",

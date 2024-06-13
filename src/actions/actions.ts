@@ -14,10 +14,11 @@ import { VerifyFactsFormSchema } from "@/components/admin/verifyFacts"
 import { searchUsingTavilly } from "./search"
 
 export type FactCheckerResponse = {
-    input: "string"
-    isAccurate: "true" | "false"
-    source: string
-    text: string
+    input: string;
+    isAccurate: "true" | "false";
+    source: string;
+    text: string;
+    additionalContext: string; // New field to store more context
 }
 
 export const handleInitialFormSubmit = async (
@@ -31,9 +32,15 @@ export const handleInitialFormSubmit = async (
         const videoTitle = videoInfo.videoDetails.title;
         const videoDescription = videoInfo.videoDetails.description || "No description available"; 
 
+        const transcript = await transcribeVideo(formData.link)
+        const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcript}`;
 // Include title and description in the transcription
-const transcription = await transcribeVideo(formData.link);
-const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcription}`;
+
+const searchResult = await searchUsingTavilly(transcript);
+const additionalContext = JSON.parse(searchResult).someRelevantField; 
+        if (!transcript) {
+            throw new Error("Couldn't transcribe the Audio.")
+        }
 
         const existingVideo = await db.video.findUnique({
             where: {
@@ -61,12 +68,14 @@ const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcripti
                     enhancedTranscription,
                     formData.model,
                     videoTitle, // Pass this argument
-                    videoDescription // Pass this argument
+                    videoDescription, // Pass this argument
+                    additionalContext
                 );
             } else {
                 summary = await summarizeTranscriptWithGroq(
                     existingVideo.transcript!,
-                    formData.model
+                    formData.model,
+                    additionalContext
                 )
             }
 
@@ -84,10 +93,6 @@ const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcripti
             return videoId
         }
 
-        const transcript = await transcribeVideo(formData.link)
-        if (!transcript) {
-            throw new Error("Couldn't transcribe the Audio.")
-        }
 
         await db.video.create({
             data: {
@@ -102,14 +107,16 @@ const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcripti
             summary = await summarizeTranscriptWithGpt(
                 enhancedTranscription,
                 formData.model,
-                videoTitle, // Pass this argument
-                videoDescription // Pass this argument
+                videoTitle,
+                videoDescription,
+                additionalContext // Pass this new argument
             );
         } else {
             summary = await summarizeTranscriptWithGroq(
-                transcript,
-                formData.model
-            )
+                enhancedTranscription,
+                formData.model,
+                additionalContext // Pass this new argument
+            );
         }
 
         if (!summary) {
@@ -139,6 +146,8 @@ const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcripti
 }
 
 handleInitialFormSubmit.maxDuration = 300;
+
+
 
 // export const handleRegenerateSummary = async (
 //     formData: z.infer<typeof RegenerateFormSchema>
@@ -204,10 +213,22 @@ export const checkFacts = async (
     formData: z.infer<typeof VerifyFactsFormSchema>
 ) => {
     try {
-        const res = await searchUsingTavilly(formData.summary)
-        return await JSON.parse(res)
+        const res = await searchUsingTavilly(formData.summary);
+        const parsedResult = JSON.parse(res);
+
+        // Extract additional context from the parsed result
+        const additionalContext = parsedResult.someRelevantField; // Adjust according to actual structure
+
+        return {
+            input: formData.summary,
+            isAccurate: parsedResult.isAccurate, // Assuming these fields exist
+            source: parsedResult.source,
+            text: parsedResult.text,
+            additionalContext: additionalContext
+        } as FactCheckerResponse;
     } catch (e) {
-        console.error(e)
-        return null
+        console.error(e);
+        return null;
     }
 }
+

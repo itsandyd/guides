@@ -48,6 +48,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
     "editorjs-react-renderer": "^3.5.1",
+    "embla-carousel-react": "^8.1.5",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
     "langchain": "^0.2.3",

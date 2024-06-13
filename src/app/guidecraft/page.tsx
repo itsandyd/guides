@@ -6,7 +6,6 @@ import { getAuthSession } from '@/lib/auth'
 import { Home as HomeIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import Feed from './feed/page'
 import Hero from '@/components/landing/hero'
 import LatestPosts from '@/components/landing/latest-posts'
 import Component from '@/components/landing/landing'
@@ -19,9 +18,9 @@ export default async function Home() {
 
   return (
     <div>
-      <Hero />
-      <LatestPosts />
-      {/* <Component /> */}
+      {/* <Hero />
+      <LatestPosts /> */}
+      <Component />
     </div>
   )
 }
