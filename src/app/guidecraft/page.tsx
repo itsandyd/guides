@@ -78,9 +78,7 @@ export default async function Home() {
   const session = await getAuthSession()
 
   return (
-    <div>
-      {/* <Hero />
-      <LatestPosts /> */}
+    <div className="bg-[#1a1a1a] text-white">
       <Component />
     </div>
   )
