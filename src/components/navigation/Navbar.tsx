@@ -95,9 +95,9 @@ const Navbar = async () => {
                 Guide Categories
             </Button>
         </Link>
-        <Link href="/twitch">
+        <Link href="/guidecraft">
             <Button variant="ghost" className="rounded-full">
-                Streamers
+                GuideCraft
             </Button>
         </Link>
         <Link href="https://emotemaker.ai">
