@@ -3,7 +3,7 @@
     "pages/api/**/*": {
       "maxDuration": 300 
     },
-    "src/app/admin/create/page.tsx": {
+    "src/app/guidecraft/create/page.tsx": {
       "maxDuration": 300
     }
 
