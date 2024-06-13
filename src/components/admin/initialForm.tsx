@@ -49,7 +49,7 @@ export const InitialForm = () => {
                         (value: string | null) => {
                             if (value) {
                                 toast.info("Redirecting...");
-                                router.push(`/admin/create/${value}`);
+                                router.push(`/guidecraft/create/${value}`);
                             } else {
                                 toast.error("An Error Occurred while Generating the Summary.");
                                 router.refresh();
