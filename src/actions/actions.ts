@@ -61,7 +61,7 @@ const additionalContext = JSON.parse(searchResult).someRelevantField;
 
             let summary: MessageContent | null = null
             if (
-                formData.model == "gpt-3.5-turbo" ||
+                // formData.model == "gpt-3.5-turbo" ||
                 formData.model == "gpt-4o"
             ) {
                 summary = await summarizeTranscriptWithGpt(
@@ -103,21 +103,21 @@ const additionalContext = JSON.parse(searchResult).someRelevantField;
         });
 
         let summary: MessageContent | null = null
-        if (formData.model == "gpt-3.5-turbo" || formData.model == "gpt-4o") {
-            summary = await summarizeTranscriptWithGpt(
-                enhancedTranscription,
-                formData.model,
-                videoTitle,
-                videoDescription,
-                additionalContext // Pass this new argument
-            );
-        } else {
-            summary = await summarizeTranscriptWithGroq(
-                enhancedTranscription,
-                formData.model,
-                additionalContext // Pass this new argument
-            );
-        }
+        // if (formData.model == "gpt-3.5-turbo" || formData.model == "gpt-4o") {
+        //     summary = await summarizeTranscriptWithGpt(
+        //         enhancedTranscription,
+        //         formData.model,
+        //         videoTitle,
+        //         videoDescription,
+        //         additionalContext // Pass this new argument
+        //     );
+        // } else {
+        //     summary = await summarizeTranscriptWithGroq(
+        //         enhancedTranscription,
+        //         formData.model,
+        //         additionalContext // Pass this new argument
+        //     );
+        // }
 
         if (!summary) {
             throw new Error("Couldn't summarize the Transcript.")

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ListVideo, Loader, Settings2 } from "lucide-react"
+import { ListVideo, Loader, Settings2, Wand2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -21,11 +21,11 @@ import { handleInitialFormSubmit } from "@/actions/actions"
 export const formSchema = z.object({
     link: z.string().describe("The YouTube Video you would like to summarize."),
     model: z.enum([
-        "gpt-3.5-turbo",
-        "gemma-7b-it",
+        // "gpt-3.5-turbo",
+        // "gemma-7b-it",
         "gpt-4o",
-        "llama3-70b-8192",
-        "mixtral-8x7b-32768",
+        // "llama3-70b-8192",
+        // "mixtral-8x7b-32768",
     ]),
 })
 
@@ -35,7 +35,7 @@ export const InitialForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o",
         },
     })
 
@@ -78,7 +78,7 @@ export const InitialForm = () => {
                         )}
                     />
 
-                    <FormField
+                    {/* <FormField
                         disabled={form.formState.isSubmitting}
                         control={form.control}
                         name="model"
@@ -146,7 +146,7 @@ export const InitialForm = () => {
                                 </DropdownMenu>
                             </FormItem>
                         )}
-                    />
+                    /> */}
                 </div>
 
                 <Button
@@ -160,8 +160,8 @@ export const InitialForm = () => {
                         </>
                     ) : (
                         <>
-                            Summarize
-                            <ListVideo className="ml-2 size-4 transition-all duration-200 group-hover:ml-4" />
+                            Craft
+                            <Wand2 className="ml-2 size-4 transition-all duration-200 group-hover:ml-4" />
                         </>
                     )}
                 </Button>

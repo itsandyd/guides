@@ -9,9 +9,9 @@ export default async function CreatePage() {
       <div className="bg-[#1a1a1a] text-white w-full min-h-screen flex flex-col items-center py-12 md:py-16 lg:py-20">
         <div className="space-y-6 w-full max-w-4xl px-4">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">Submit Your YouTube URL</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">Craft Your Perfect Guide</h1>
             <p className="mt-3 text-gray-500 dark:text-gray-400 text-lg md:text-xl">
-              Effortlessly convert your video tutorials into polished written guides.
+            Submit Your YouTube URL and Transform Your Video into a Polished, SEO-Optimized Written Guide Effortlessly!
             </p>
           </div>
           <div className="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-6 md:p-8 lg:p-10 space-y-6 flex items-center justify-center">
