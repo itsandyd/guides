@@ -67,7 +67,7 @@ export const InitialForm = () => {
                         control={form.control}
                         name="link"
                         render={({ field }) => (
-                            <FormItem className="w-full">
+                            <FormItem className="w-full text-black">
                                 <FormControl>
                                     <Input
                                         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
