@@ -12,6 +12,7 @@ import axios from "axios"
 import { Button } from "@/components/ui/Button"
 import CreatePost from "@/components/admin/createPost"
 import { Editor } from "@/components/Editor"
+import Image from "next/image"
 
 type Props = {
     params: { id: string }
@@ -47,9 +48,17 @@ type Props = {
 
 export default async function SummaryIndexPage({ params }: Props) {
     const data = await db.summary.findFirst({
-        where: { videoid: params.id }
+        where: { videoid: params.id },
+        include: {
+            video: {
+                include: {
+                    screenshots: true,
+                },
+            },
+        },
     });
-    
+
+    // console.log(data);
 
     if (!data) {
         return (
@@ -65,21 +74,8 @@ export default async function SummaryIndexPage({ params }: Props) {
                     </p>
                 </div>
             </section>
-        )
+        );
     }
-
-    const handleCreatePost = async () => {
-        try {
-            const response = await axios.post('/api/subreddit/post/create', {
-                title: videoInfo.videoDetails.title,
-                content: data.summary,
-                subredditId: 'your-subreddit-id' // You need to specify the subreddit ID
-            });
-            console.log('Post created:', response.data);
-        } catch (error) {
-            console.error('Error creating post:', error);
-        }
-    };
 
     const videoInfo = await ytdl.getInfo(data.videoid ?? "");
 
@@ -111,41 +107,40 @@ export default async function SummaryIndexPage({ params }: Props) {
                                     <Eye className="mr-2 size-3" /> {videoInfo.videoDetails.viewCount}
                                 </Badge>
                             </div>
-    {/* <Button onClick={handleCreatePost}>Create Post</Button> */}
                         </div>
                     </div>
                 </div>
-                {/* <div className="flex w-full flex-col items-start gap-5 rounded-xl p-5 text-justify outline-dashed outline-2 outline-secondary md:text-left">
-                    {data.summary}
-                    <RegenerateSummaryButton videoid={data.videoid} />
-                </div> */}
-                {/* <Editor
-                    subredditId={subredditId}
-                    content={data.summary}
-                    title={videoInfo.videoDetails.title}
-                    description={videoInfo.videoDetails.description || ""}
-                    author={videoInfo.videoDetails.author.name}
-                    thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
-                /> */}
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    {data.video.screenshots.map((screenshot) => (
+                        <Image
+                            key={screenshot.id}
+                            src={screenshot.url}
+                            alt={`Screenshot ${screenshot.id}`}
+                            width={256}
+                            height={144}
+                            className="rounded-lg"
+                        />
+                    ))}
+                </div>
             </div>
 
             <div className="flex w-full flex-col gap-10">
-            <CreatePost
-    title={videoInfo.videoDetails.title}
-    content={data.summary}
-    description={videoInfo.videoDetails.description || ""}
-    author={videoInfo.videoDetails.author.name}
-    thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
-/>
+                <CreatePost
+                    title={videoInfo.videoDetails.title}
+                    content={data.summary}
+                    description={videoInfo.videoDetails.description || ""}
+                    author={videoInfo.videoDetails.author.name}
+                    thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
+                />
                 <VerifyFacts summary={data.summary} />
             </div>
             <div className="mb-8">
-            <div className='w-full flex justify-end'>
-        <Button type='submit' className='w-full' form='subreddit-post-form'>
-          Post
-        </Button>
-      </div>
-      </div>
+                <div className='w-full flex justify-end'>
+                    <Button type='submit' className='w-full' form='subreddit-post-form'>
+                        Post
+                    </Button>
+                </div>
+            </div>
         </section>
-    )
+    );
 }

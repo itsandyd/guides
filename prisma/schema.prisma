@@ -198,13 +198,26 @@ model TwitchChannel {
   @@index([userId])
 }
 
+model Screenshot {
+  id        String   @id @default(cuid())
+  videoId   String
+  path      String   @unique
+  url       String // Add this line to store the S3 URL
+  createdAt DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [videoid], onDelete: Cascade)
+
+  @@index([videoId])
+}
+
 model Video {
-  id         String    @id @default(cuid())
-  videoid    String    @unique
-  videotitle String    @db.Text
-  transcript String    @db.LongText // Use Text for potentially long strings
-  created_at DateTime  @default(now())
-  summaries  Summary[]
+  id          String       @id @default(cuid())
+  videoid     String       @unique
+  videotitle  String       @db.Text
+  transcript  String       @db.LongText
+  created_at  DateTime     @default(now())
+  summaries   Summary[]
+  screenshots Screenshot[] // Add this line
 }
 
 model Summary {
