@@ -45,7 +45,6 @@ const uploadToS3 = (filePath: string, bucketName: string, key: string): Promise<
     });
 };
 
-
 ffmpeg.setFfmpegPath(ffmpegPath.path);
 ffmpeg.setFfprobePath(ffprobePath.path);
 
@@ -57,53 +56,34 @@ export type FactCheckerResponse = {
     additionalContext: string; // New field to store more context
 }
 
-const downloadVideo = (videoUrl: string, outputFile: string) => {
+const downloadVideo = (videoUrl: string, outputFile: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         ytdl(videoUrl)
             .pipe(fs.createWriteStream(outputFile))
             .on('finish', () => {
                 console.log(`Video downloaded to ${outputFile}`);
-                // resolve();
+                resolve(); // Resolve the promise with void
             })
             .on('error', reject);
     });
 };
 
-const captureScreenshots = (videoFile: string, timestamps: number[], outputDir: string) => {
+const captureScreenshots = (videoFile: string, outputDir: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-        if (timestamps.length === 0) {
-            return reject(new Error("No timestamps provided for capturing screenshots."));
-        }
-
-        const captureScreenshot = (timestamp: number, index: number) => {
-            return new Promise<void>((resolve, reject) => {
-                ffmpeg(videoFile)
-                    .on('error', (err) => {
-                        console.error(`FFmpeg error at timestamp ${timestamp}:`, err);
-                        reject(err);
-                    })
-                    .on('end', resolve)
-                    .screenshots({
-                        timestamps: [timestamp],
-                        folder: outputDir,
-                        size: '1280x720',
-                        filename: `screenshot-${index + 1}.png`
-                    });
+        ffmpeg(videoFile)
+            .on('end', () => {
+                console.log('Screenshots captured');
+                resolve(); // Resolve the promise with void
+            })
+            .on('error', reject)
+            .screenshots({
+                count: 10,
+                folder: outputDir,
+                size: '1280x720',
+                filename: 'screenshot-%i.png'
             });
-        };
-
-        const captureAllScreenshots = async () => {
-            for (let i = 0; i < timestamps.length; i++) {
-                await captureScreenshot(timestamps[i], i);
-            }
-        };
-
-        captureAllScreenshots()
-            .then(resolve)
-            .catch(reject);
     });
 };
-
 
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>
@@ -114,18 +94,22 @@ export const handleInitialFormSubmit = async (
     const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
 
     try {
+        console.log('Creating screenshots directory if it does not exist');
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir);
         }
 
+        console.log('Fetching video info');
         const videoInfo = await ytdl.getInfo(formData.link);
         const videoId = videoInfo.videoDetails.videoId;
         const videoTitle = videoInfo.videoDetails.title;
         const videoDescription = videoInfo.videoDetails.description || "No description available";
 
+        console.log('Transcribing video');
         const transcript = await transcribeVideo(formData.link);
         const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcript}`;
 
+        console.log('Searching using Tavilly');
         const searchResult = await searchUsingTavilly(transcript);
         const additionalContext = JSON.parse(searchResult).someRelevantField;
 
@@ -133,47 +117,36 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't transcribe the Audio.");
         }
 
+        console.log('Downloading video');
         await downloadVideo(formData.link, videoFile);
 
-        // Extract key moments from the transcript
-        let keyMoments = extractKeyMoments(transcript);
+        console.log('Capturing screenshots');
+        await captureScreenshots(videoFile, outputDir);
 
-        // Fallback to regular intervals if no key moments are found
-        if (keyMoments.length === 0) {
-            const videoInfo = await ytdl.getBasicInfo(formData.link);
-            const videoDuration = parseFloat(videoInfo.videoDetails.lengthSeconds);
-            if (isNaN(videoDuration)) {
-                throw new Error("Couldn't determine the video duration.");
-            }
-            const interval = Math.floor(videoDuration / 10); // Capture 10 screenshots evenly spaced
-            keyMoments = Array.from({ length: 10 }, (_, i) => i * interval);
-            console.log("No key moments found, using regular intervals:", keyMoments);
-        }
-
-        await captureScreenshots(videoFile, keyMoments, outputDir);
-
-        // Save screenshots to the database and upload to S3
+        console.log('Uploading screenshots to S3 and saving to database');
         const screenshotFiles = fs.readdirSync(outputDir);
         for (const file of screenshotFiles) {
             const filePath = path.join(outputDir, file);
-            const s3Url = await uploadToS3(filePath, bucketName, `screenshots/${file}`);
+            const s3Url = await uploadToS3(filePath, bucketName, `screenshots/${videoTitle}-${file}`);
 
             // Check if the screenshot already exists
             const existingScreenshot = await db.screenshot.findUnique({
-                where: { path: filePath }
+                where: { url: s3Url } // Use URL as the unique identifier
             });
 
             if (!existingScreenshot) {
+                console.log(`Saving screenshot ${s3Url} to database`);
                 await db.screenshot.create({
                     data: {
                         videoId: videoId,
-                        path: filePath,
                         url: s3Url, // Save the S3 URL
                     }
                 });
+                console.log(`Saved screenshot ${s3Url} to database`);
             }
         }
 
+        console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({
             where: {
               videoid: videoId
@@ -181,6 +154,7 @@ export const handleInitialFormSubmit = async (
         });
           
         if (existingVideo) {
+            console.log('Video exists, checking for existing summary');
             const existingSummary = await db.summary.findFirst({
               where: {
                 videoid: existingVideo.videoid
@@ -188,9 +162,11 @@ export const handleInitialFormSubmit = async (
             });
           
             if (existingSummary) {
+              console.log('Summary exists, returning video ID');
               return existingSummary.videoid;
             }
 
+            console.log('Generating summary');
             let summary: MessageContent | null = null
             if (formData.model == "gpt-4o") {
                 summary = await summarizeTranscriptWithGpt(
@@ -212,6 +188,7 @@ export const handleInitialFormSubmit = async (
                 throw new Error("Couldn't summarize the Transcript.")
             }
 
+            console.log('Saving summary to database');
             await db.summary.create({
                 data: {
                     videoid: videoId,
@@ -222,6 +199,7 @@ export const handleInitialFormSubmit = async (
             return videoId
         }
 
+        console.log('Creating new video entry in database');
         await db.video.create({
             data: {
                 videoid: videoId,
@@ -230,6 +208,7 @@ export const handleInitialFormSubmit = async (
             }
         });
 
+        console.log('Generating summary');
         let summary: MessageContent | null = null
         if (formData.model == "gpt-4o") {
             summary = await summarizeTranscriptWithGpt(
@@ -251,6 +230,7 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't summarize the Transcript.")
         }
 
+        console.log('Saving summary to database');
         await db.summary.create({
             data: {
                 videoid: videoId,
@@ -263,6 +243,27 @@ export const handleInitialFormSubmit = async (
         console.error(e)
         return null
     } finally {
+        console.log('Cleaning up: Deleting video and screenshots');
+        try {
+            if (fs.existsSync(videoFile)) {
+                fs.unlinkSync(videoFile);
+                console.log(`Deleted video file: ${videoFile}`);
+            }
+
+            if (fs.existsSync(outputDir)) {
+                const screenshotFiles = fs.readdirSync(outputDir);
+                for (const file of screenshotFiles) {
+                    const filePath = path.join(outputDir, file);
+                    fs.unlinkSync(filePath);
+                    console.log(`Deleted screenshot file: ${filePath}`);
+                }
+                fs.rmdirSync(outputDir);
+                console.log(`Deleted screenshots directory: ${outputDir}`);
+            }
+        } catch (cleanupError) {
+            console.error("Error during cleanup:", cleanupError);
+        }
+
         console.log(
             `Generated ${formData.link} in ${(Date.now() - start) / 1000} seconds.`
         );
@@ -277,6 +278,7 @@ export const checkFacts = async (
     formData: z.infer<typeof VerifyFactsFormSchema>
 ) => {
     try {
+        console.log('Checking facts');
         const res = await searchUsingTavilly(formData.summary);
         const parsedResult = JSON.parse(res);
 

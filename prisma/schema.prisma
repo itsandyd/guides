@@ -201,8 +201,7 @@ model TwitchChannel {
 model Screenshot {
   id        String   @id @default(cuid())
   videoId   String
-  path      String   @unique
-  url       String // Add this line to store the S3 URL
+  url       String   @unique // Make URL unique
   createdAt DateTime @default(now())
 
   video Video @relation(fields: [videoId], references: [videoid], onDelete: Cascade)
@@ -217,7 +216,7 @@ model Video {
   transcript  String       @db.LongText
   created_at  DateTime     @default(now())
   summaries   Summary[]
-  screenshots Screenshot[] // Add this line
+  screenshots Screenshot[] // Ensure this line is present
 }
 
 model Summary {
