@@ -27,7 +27,7 @@ interface EditorProps {
   thumbnail?: string
 }
 
-export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
+export const Editor: React.FC<EditorProps> = ({ subredditId, content }) => {
   const {
     register,
     handleSubmit,

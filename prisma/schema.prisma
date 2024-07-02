@@ -201,8 +201,10 @@ model TwitchChannel {
 model Screenshot {
   id        String   @id @default(cuid())
   videoId   String
-  url       String   @unique // Make URL unique
+  filename  String?  @db.Text
+  url       String
   createdAt DateTime @default(now())
+  caption   String?  @db.Text
 
   video Video @relation(fields: [videoId], references: [videoid], onDelete: Cascade)
 
@@ -216,7 +218,7 @@ model Video {
   transcript  String       @db.LongText
   created_at  DateTime     @default(now())
   summaries   Summary[]
-  screenshots Screenshot[] // Ensure this line is present
+  screenshots Screenshot[]
 }
 
 model Summary {

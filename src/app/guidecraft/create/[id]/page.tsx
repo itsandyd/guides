@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/Button"
 import CreatePost from "@/components/admin/createPost"
 import { Editor } from "@/components/Editor"
 import Image from "next/image"
+import Link from "next/link"
+import EditorOutput from "@/components/EditorOutput"
 
 type Props = {
     params: { id: string }
@@ -58,8 +60,6 @@ export default async function SummaryIndexPage({ params }: Props) {
         },
     });
 
-    // console.log(data);
-
     if (!data) {
         return (
             <section className="container mt-40 flex items-center">
@@ -78,6 +78,13 @@ export default async function SummaryIndexPage({ params }: Props) {
     }
 
     const videoInfo = await ytdl.getInfo(data.videoid ?? "");
+    let formattedSummary;
+    try {
+        formattedSummary = JSON.parse(data.summary);
+    } catch (error) {
+        console.error("Error parsing summary JSON:", error);
+        formattedSummary = null;
+    }
 
     return (
         <section className="container mt-10 grid w-full grid-cols-1 gap-10 md:grid-cols-3">
@@ -110,21 +117,13 @@ export default async function SummaryIndexPage({ params }: Props) {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                    {data.video.screenshots.map((screenshot) => (
-                        <Image
-                            key={screenshot.id}
-                            src={screenshot.url}
-                            alt={`Screenshot ${screenshot.id}`}
-                            width={256}
-                            height={144}
-                            className="rounded-lg"
-                        />
-                    ))}
-                </div>
-            </div>
+                {/* <div className="flex flex-col items-start gap-5 rounded-xl bg-secondary p-5">
+                        <> 
+                            <Editor content={data.summary} subredditId="general"/>
+                            <EditorOutput content={data.summary} />
+                        </>
 
-            <div className="flex w-full flex-col gap-10">
+                </div> */}
                 <CreatePost
                     title={videoInfo.videoDetails.title}
                     content={data.summary}
@@ -132,13 +131,30 @@ export default async function SummaryIndexPage({ params }: Props) {
                     author={videoInfo.videoDetails.author.name}
                     thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
                 />
-                <VerifyFacts summary={data.summary} />
+                {/* <VerifyFacts summary={data.summary} /> */}
+                {/* <div className="mb-8">
+                    <div className='w-full flex justify-end'>
+                        <Button type='submit' className='w-full' form='subreddit-post-form'>
+                            Post
+                        </Button>
+                    </div>
+                </div> */}
             </div>
-            <div className="mb-8">
-                <div className='w-full flex justify-end'>
-                    <Button type='submit' className='w-full' form='subreddit-post-form'>
-                        Post
-                    </Button>
+
+            <div className="flex w-full flex-col gap-10">
+                <VerifyFacts summary={data.summary} />
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+                    {data.video.screenshots.map((screenshot) => (
+                        <Link href={screenshot.url} key={screenshot.id}>
+                            <Image
+                                src={screenshot.url.startsWith('http') ? screenshot.url : `/${screenshot.url}`}
+                                alt={`Screenshot ${screenshot.id}`}
+                                width={256}
+                                height={144}
+                                className="rounded-lg"
+                            />
+                        </Link>
+                    ))}
                 </div>
             </div>
         </section>

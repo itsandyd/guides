@@ -7,6 +7,7 @@ const nextConfig = {
       "static-cdn.jtvnw.net",
       "i.ytimg.com",
       "pprcanvas.s3.amazonaws.com",
+      "res.cloudinary.com",
     ],
   },
   experimental: {
