@@ -25,6 +25,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
                 resource_type: 'video',
                 public_id: `video_${videoId}`,
                 overwrite: true,
+                quality: 'auto'
             },
             (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
                 if (error || !result) {
@@ -38,7 +39,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
         );
 
         // Stream the video to Cloudinary
-        ytdl(url, { quality: 'highestvideo' })
+        ytdl(url, { })
             .pipe(uploadStream)
             .on('error', (err) => {
                 console.error('Error downloading video:', err);
