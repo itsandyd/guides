@@ -39,7 +39,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
         );
 
         // Stream the video to Cloudinary
-        ytdl(url, { quality: 'auto' })
+        ytdl(url, { quality: 'highest' })
             .pipe(uploadStream)
             .on('error', (err) => {
                 console.error('Error downloading video:', err);
