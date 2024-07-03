@@ -53,7 +53,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ title, content, descript
             <Textarea
                 {...form.register("content")}
                 placeholder="Enter content"
-                className="h-full"
+                className="h-full flex"
             />
             <Button type="submit" disabled={form.formState.isSubmitting}>
                 Create Post
