@@ -47,6 +47,29 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
     });
 };
 
+const captureScreenshotsFromCloudinary = async (videoId: string, videoDuration: number): Promise<string[]> => {
+    const screenshotUrls: string[] = [];
+
+    for (let i = 0; i < videoDuration; i += 2) {
+        const screenshotUrl = cloudinary.url(`video_${videoId}.jpg`, {
+            resource_type: 'video',
+            transformation: [
+                { width: 1920, height: 1080, crop: "fill" },
+                { format: "jpg" },
+                { start_offset: i }
+            ]
+        });
+        screenshotUrls.push(screenshotUrl);
+    }
+
+    return screenshotUrls;
+};
+
+// const generateCaptionForScreenshot = async (screenshotUrl: string): Promise<string> => {
+//     // Replace this with your caption generation logic
+//     return `Caption for ${screenshotUrl}`;
+// };
+
 // Define FactCheckerResponse type
 export type FactCheckerResponse = {
     input: string;
@@ -78,6 +101,29 @@ export const handleInitialFormSubmit = async (
 
         console.log('Streaming video to Cloudinary');
         const cloudinaryUrl = await streamVideoToCloudinary(formData.link, videoId);
+
+        console.log('Capturing screenshots from Cloudinary');
+        const videoDuration = 1800; // Replace this with the actual video duration in seconds
+        // const screenshotUrls = await captureScreenshotsFromCloudinary(videoId, videoDuration);
+
+        // console.log('Saving screenshots to database');
+        // for (const [index, screenshotUrl] of Array.from(screenshotUrls.entries())) {
+        //     try {
+        //         // const caption = await generateCaptionForScreenshot(screenshotUrl);
+        //         console.log(`Saving screenshot ${index + 1} with URL ${screenshotUrl}`);
+        //         await db.screenshot.create({
+        //             data: {
+        //                 videoId: videoId,
+        //                 filename: `screenshot-${index + 1}.jpg`,
+        //                 url: screenshotUrl,
+        //                 // caption: caption
+        //             }
+        //         });
+        //         console.log(`Saved screenshot ${index + 1} to database`);
+        //     } catch (error) {
+        //         console.error(`Error saving screenshot ${index + 1} to database: ${error}`);
+        //     }
+        // }
 
         console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({
