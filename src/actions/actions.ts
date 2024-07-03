@@ -1,7 +1,7 @@
 "use server"
 
 import ytdl from "ytdl-core";
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { transcribeVideo } from "./transcribe";
@@ -26,10 +26,10 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
                 public_id: `video_${videoId}`,
                 overwrite: true
             },
-            (error, result: UploadApiResponse | undefined) => {
+            (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
                 if (error || !result) {
-                    console.error(`Error uploading video to Cloudinary: ${error}`);
-                    reject(error || new Error("Upload result is undefined"));
+                    console.error('Error uploading video to Cloudinary:', error || 'Upload result is undefined');
+                    reject(error || new Error('Upload result is undefined'));
                 } else {
                     console.log(`Uploaded video to Cloudinary at ${result.secure_url}`);
                     resolve(result.secure_url); // Return the Cloudinary URL
@@ -41,7 +41,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
         ytdl(url, { quality: 'highest' })
             .pipe(uploadStream)
             .on('error', (err) => {
-                console.error(`Error downloading video: ${err}`);
+                console.error('Error downloading video:', err);
                 reject(err);
             });
     });
@@ -215,7 +215,7 @@ export const handleInitialFormSubmit = async (
 
         return videoId;
     } catch (e: any) {
-        console.error(e);
+        console.error('Unhandled error:', e);
         return null;
     } finally {
         console.log(
