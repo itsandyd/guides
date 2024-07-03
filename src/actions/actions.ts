@@ -24,7 +24,17 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
             {
                 resource_type: 'video',
                 public_id: `video_${videoId}`,
-                overwrite: true
+                overwrite: true,
+                timeout: 12000,
+                eager: [
+                    {
+                        width: 1280,
+                        height: 720,
+                        crop: 'fit',
+                        format: 'mp4',
+                        // quality: 'auto'
+                    }
+                ]
             },
             (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
                 if (error || !result) {
@@ -38,7 +48,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
         );
 
         // Stream the video to Cloudinary
-        ytdl(url, { quality: 'highest' })
+        ytdl(url, { quality: 'highestvideo' })
             .pipe(uploadStream)
             .on('error', (err) => {
                 console.error('Error downloading video:', err);
@@ -226,7 +236,7 @@ export const handleInitialFormSubmit = async (
     }
 }
 
-handleInitialFormSubmit.maxDuration = 300;
+handleInitialFormSubmit.maxDuration = 500;
 
 export const checkFacts = async (
     formData: z.infer<typeof VerifyFactsFormSchema>
