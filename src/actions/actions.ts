@@ -164,45 +164,87 @@ export type FactCheckerResponse = {
 //     });
 // };
 
-const downloadVideo = (url: string, bucketName: string, key: string): Promise<string> => {
+// const downloadVideo = (url: string, bucketName: string, key: string): Promise<string> => {
+//     return new Promise((resolve, reject) => {
+//         const videoStream = ytdl(url);
+//         const tempDir = path.join(process.cwd(), 'temp');
+//         if (!fs.existsSync(tempDir)) {
+//             fs.mkdirSync(tempDir, { recursive: true });
+//         }
+//         const tempFilePath = path.join(tempDir, `${path.basename(key)}`);
+//         const writeStream = fs.createWriteStream(tempFilePath);
+
+//         // Download the video to a temporary file
+//         videoStream.pipe(writeStream);
+
+//         writeStream.on('finish', () => {
+//             console.log('Video downloaded to temporary file:', tempFilePath);
+
+//             // Upload the video to S3
+//             const uploadParams = {
+//                 Bucket: bucketName,
+//                 Key: key,
+//                 Body: fs.createReadStream(tempFilePath),
+//                 ContentType: 'video/mp4',
+//             };
+
+//             s3.upload(uploadParams, (err: Error, data: AWS.S3.ManagedUpload.SendData) => {
+//                 if (err) {
+//                     console.error(`Error uploading video to S3: ${err}`);
+//                     reject(err);
+//                 } else {
+//                     console.log(`Uploaded video to S3 at ${data.Location}`);
+//                     resolve(tempFilePath); // Return the local file path
+//                 }
+//             });
+//         });
+
+//         writeStream.on('error', (err) => {
+//             console.error(`Error downloading video: ${err}`);
+//             reject(err);
+//         });
+//     });
+// };
+
+const downloadAndUploadVideo = async (url: string, videoId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-        const videoStream = ytdl(url);
         const tempDir = path.join(process.cwd(), 'temp');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
-        const tempFilePath = path.join(tempDir, `${path.basename(key)}`);
+        const tempFilePath = path.join(tempDir, `${videoId}.mp4`);
         const writeStream = fs.createWriteStream(tempFilePath);
 
         // Download the video to a temporary file
-        videoStream.pipe(writeStream);
+        ytdl(url)
+            .pipe(writeStream)
+            .on('finish', async () => {
+                try {
+                    console.log('Video downloaded to temporary file:', tempFilePath);
 
-        writeStream.on('finish', () => {
-            console.log('Video downloaded to temporary file:', tempFilePath);
+                    // Upload the video to Cloudinary
+                    const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
+                        resource_type: 'video',
+                        public_id: `video_${videoId}`,
+                        overwrite: true
+                    });
 
-            // Upload the video to S3
-            const uploadParams = {
-                Bucket: bucketName,
-                Key: key,
-                Body: fs.createReadStream(tempFilePath),
-                ContentType: 'video/mp4',
-            };
+                    console.log(`Uploaded video to Cloudinary at ${uploadResult.secure_url}`);
 
-            s3.upload(uploadParams, (err: Error, data: AWS.S3.ManagedUpload.SendData) => {
-                if (err) {
-                    console.error(`Error uploading video to S3: ${err}`);
+                    // Clean up: delete the temporary video file
+                    fs.unlinkSync(tempFilePath);
+                    console.log(`Deleted temporary video file: ${tempFilePath}`);
+
+                    resolve(uploadResult.secure_url); // Return the Cloudinary URL
+                } catch (err) {
+                    console.error(`Error uploading video to Cloudinary: ${err}`);
                     reject(err);
-                } else {
-                    console.log(`Uploaded video to S3 at ${data.Location}`);
-                    resolve(tempFilePath); // Return the local file path
                 }
+            })
+            .on('error', (err) => {
+                console.error(`Error downloading video: ${err}`);
+                reject(err);
             });
-        });
-
-        writeStream.on('error', (err) => {
-            console.error(`Error downloading video: ${err}`);
-            reject(err);
-        });
     });
 };
 
@@ -689,19 +731,191 @@ const generateCaptionForScreenshot = async (screenshotUrl: string): Promise<stri
 //     }
 // }
 
+// export const handleInitialFormSubmit = async (
+//     formData: z.infer<typeof formSchema>
+// ) => {
+//     const start = Date.now();
+//     const outputDir = path.join(__dirname, 'screenshots');
+//     const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
+
+//     try {
+//         console.log('Creating screenshots directory if it does not exist');
+//         if (!fs.existsSync(outputDir)) {
+//             fs.mkdirSync(outputDir);
+//         }
+
+//         console.log('Fetching video info');
+//         const videoInfo = await ytdl.getInfo(formData.link);
+//         const videoId = videoInfo.videoDetails.videoId;
+//         const videoTitle = videoInfo.videoDetails.title;
+//         const videoDescription = videoInfo.videoDetails.description || "No description available";
+
+//         console.log('Transcribing video');
+//         const transcript = await transcribeVideo(formData.link);
+//         const enhancedTranscription = `${videoTitle}. ${videoDescription}. ${transcript}`;
+
+//         if (!transcript) {
+//             throw new Error("Couldn't transcribe the Audio.");
+//         }
+
+//         console.log('Downloading video');
+//         // const s3Url = await downloadVideo(formData.link, bucketName, `videos/${videoId}.mp4`);
+//         const videoFilePath = await downloadVideo(formData.link, bucketName, `videos/${videoId}.mp4`);
+
+//         console.log('Capturing screenshots');
+//         // await captureScreenshots(s3Url, videoId);
+//         // await captureScreenshots(formData.link, videoId);
+
+//         // await captureScreenshots(videoFilePath, videoId);
+
+//         // console.log('Uploading screenshots to S3 and saving to database');
+//         // const screenshotFiles = fs.readdirSync(outputDir);
+//         // for (const file of screenshotFiles) {
+//         //     const filePath = path.join(outputDir, file);
+//         //     const s3Url = await uploadToS3(filePath, bucketName, `screenshots/${videoTitle}-${file}`);
+//         //     const filename = `screenshots/${file}`;
+
+//         //     const existingScreenshot = await db.screenshot.findUnique({
+//         //         where: { url: s3Url }
+//         //     });
+
+//         //     if (!existingScreenshot) {
+//         //         console.log(`Saving screenshot ${filename} to database`);
+//         //         await db.screenshot.create({
+//         //             data: {
+//         //                 videoId: videoId,
+//         //                 filename,
+//         //                 url: s3Url
+//         //             }
+//         //         });
+//         //         console.log(`Saved screenshot ${filename} to database`);
+//         //     }
+//         // }
+
+//         console.log('Checking if video already exists in database');
+//         const existingVideo = await db.video.findUnique({
+//             where: {
+//                 videoid: videoId
+//             }
+//         });
+
+//         if (existingVideo) {
+//             console.log('Video exists, checking for existing summary');
+//             const existingSummary = await db.summary.findFirst({
+//                 where: {
+//                     videoid: existingVideo.videoid
+//                 }
+//             });
+
+//             if (existingSummary) {
+//                 console.log('Summary exists, returning video ID');
+//                 return existingSummary.videoid;
+//             }
+
+//             console.log('Generating summary');
+//             let summary = null;
+//             if (formData.model == "gpt-4o") {
+//                 summary = await summarizeTranscriptWithGpt(
+//                     enhancedTranscription,
+//                     formData.model,
+//                     videoTitle,
+//                     videoDescription
+//                 );
+//             } else {
+//                 summary = await summarizeTranscriptWithGroq(
+//                     enhancedTranscription,
+//                     formData.model
+//                 );
+//             }
+
+//             if (!summary) {
+//                 throw new Error("Couldn't summarize the Transcript.");
+//             }
+
+//             console.log('Saving summary to database');
+//             await db.summary.create({
+//                 data: {
+//                     videoid: videoId,
+//                     summary: summary as string,
+//                 }
+//             });
+
+//             return videoId;
+//         }
+
+//         console.log('Creating new video entry in database');
+//         await db.video.create({
+//             data: {
+//                 videoid: videoId,
+//                 videotitle: videoInfo.videoDetails.title,
+//                 transcript: transcript,
+//             }
+//         });
+
+//         console.log('Generating summary');
+//         let summary = null;
+//         if (formData.model == "gpt-4o") {
+//             summary = await summarizeTranscriptWithGpt(
+//                 enhancedTranscription,
+//                 formData.model,
+//                 videoTitle,
+//                 videoDescription
+//             );
+//         } else {
+//             summary = await summarizeTranscriptWithGroq(
+//                 enhancedTranscription,
+//                 formData.model
+//             );
+//         }
+
+//         if (!summary) {
+//             throw new Error("Couldn't summarize the Transcript.");
+//         }
+
+//         console.log('Saving summary to database');
+//         await db.summary.create({
+//             data: {
+//                 videoid: videoId,
+//                 summary: summary as string,
+//             }
+//         });
+
+//         return videoId;
+//     } catch (e: any) {
+//         console.error(e);
+//         return null;
+//     } finally {
+//         console.log('Cleaning up: Deleting video and screenshots');
+//         try {
+//             if (fs.existsSync(outputDir)) {
+//                 const screenshotFiles = fs.readdirSync(outputDir);
+//                 for (const file of screenshotFiles) {
+//                     const filePath = path.join(outputDir, file);
+//                     fs.unlinkSync(filePath);
+//                     console.log(`Deleted screenshot file: ${filePath}`);
+//                 }
+//                 fs.rmdirSync(outputDir);
+//                 console.log(`Deleted screenshots directory: ${outputDir}`);
+//             }
+//         } catch (cleanupError) {
+//             console.error("Error during cleanup:", cleanupError);
+//         }
+
+//         console.log(
+//             `Generated ${formData.link} in ${(Date.now() - start) / 1000} seconds.`
+//         );
+//         revalidatePath("/");
+//         revalidatePath("/summaries");
+//     }
+// }
+
+// handleInitialFormSubmit.maxDuration = 300;
+
 export const handleInitialFormSubmit = async (
     formData: z.infer<typeof formSchema>
 ) => {
     const start = Date.now();
-    const outputDir = path.join(__dirname, 'screenshots');
-    const bucketName = process.env.AWS_S3_BUCKET_NAME as string;
-
     try {
-        console.log('Creating screenshots directory if it does not exist');
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir);
-        }
-
         console.log('Fetching video info');
         const videoInfo = await ytdl.getInfo(formData.link);
         const videoId = videoInfo.videoDetails.videoId;
@@ -716,39 +930,8 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't transcribe the Audio.");
         }
 
-        console.log('Downloading video');
-        // const s3Url = await downloadVideo(formData.link, bucketName, `videos/${videoId}.mp4`);
-        const videoFilePath = await downloadVideo(formData.link, bucketName, `videos/${videoId}.mp4`);
-
-        console.log('Capturing screenshots');
-        // await captureScreenshots(s3Url, videoId);
-        // await captureScreenshots(formData.link, videoId);
-        
-        // await captureScreenshots(videoFilePath, videoId);
-
-        // console.log('Uploading screenshots to S3 and saving to database');
-        // const screenshotFiles = fs.readdirSync(outputDir);
-        // for (const file of screenshotFiles) {
-        //     const filePath = path.join(outputDir, file);
-        //     const s3Url = await uploadToS3(filePath, bucketName, `screenshots/${videoTitle}-${file}`);
-        //     const filename = `screenshots/${file}`;
-
-        //     const existingScreenshot = await db.screenshot.findUnique({
-        //         where: { url: s3Url }
-        //     });
-
-        //     if (!existingScreenshot) {
-        //         console.log(`Saving screenshot ${filename} to database`);
-        //         await db.screenshot.create({
-        //             data: {
-        //                 videoId: videoId,
-        //                 filename,
-        //                 url: s3Url
-        //             }
-        //         });
-        //         console.log(`Saved screenshot ${filename} to database`);
-        //     }
-        // }
+        console.log('Downloading and uploading video');
+        const cloudinaryUrl = await downloadAndUploadVideo(formData.link, videoId);
 
         console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({
@@ -843,24 +1026,8 @@ export const handleInitialFormSubmit = async (
         console.error(e);
         return null;
     } finally {
-        console.log('Cleaning up: Deleting video and screenshots');
-        try {
-            if (fs.existsSync(outputDir)) {
-                const screenshotFiles = fs.readdirSync(outputDir);
-                for (const file of screenshotFiles) {
-                    const filePath = path.join(outputDir, file);
-                    fs.unlinkSync(filePath);
-                    console.log(`Deleted screenshot file: ${filePath}`);
-                }
-                fs.rmdirSync(outputDir);
-                console.log(`Deleted screenshots directory: ${outputDir}`);
-            }
-        } catch (cleanupError) {
-            console.error("Error during cleanup:", cleanupError);
-        }
-
         console.log(
-            `Generated ${formData.link} in ${(Date.now() - start) / 1000} seconds.`
+            `Processed ${formData.link} in ${(Date.now() - start) / 1000} seconds.`
         );
         revalidatePath("/");
         revalidatePath("/summaries");
