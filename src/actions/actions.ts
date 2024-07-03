@@ -1,10 +1,7 @@
-
 "use server"
 
 import ytdl from "ytdl-core";
-import fs from 'fs';
-import path from 'path';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { transcribeVideo } from "./transcribe";
@@ -21,54 +18,42 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const streamVideoToCloudinary = async (url: string, videoId: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                resource_type: 'video',
+                public_id: `video_${videoId}`,
+                overwrite: true
+            },
+            (error, result: UploadApiResponse | undefined) => {
+                if (error || !result) {
+                    console.error(`Error uploading video to Cloudinary: ${error}`);
+                    reject(error || new Error("Upload result is undefined"));
+                } else {
+                    console.log(`Uploaded video to Cloudinary at ${result.secure_url}`);
+                    resolve(result.secure_url); // Return the Cloudinary URL
+                }
+            }
+        );
+
+        // Stream the video to Cloudinary
+        ytdl(url, { quality: 'highest' })
+            .pipe(uploadStream)
+            .on('error', (err) => {
+                console.error(`Error downloading video: ${err}`);
+                reject(err);
+            });
+    });
+};
+
+// Define FactCheckerResponse type
 export type FactCheckerResponse = {
     input: string;
     isAccurate: "true" | "false";
     source: string;
     text: string;
     additionalContext: string;
-};
-
-const downloadAndUploadVideo = async (url: string, videoId: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const tempDir = path.join(process.cwd(), 'temp');
-        if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-        }
-        const tempFilePath = path.join(tempDir, `${videoId}.mp4`);
-        const writeStream = fs.createWriteStream(tempFilePath);
-
-        // Download the video to a temporary file
-        ytdl(url)
-            .pipe(writeStream)
-            .on('finish', async () => {
-                try {
-                    console.log('Video downloaded to temporary file:', tempFilePath);
-
-                    // Upload the video to Cloudinary
-                    const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
-                        resource_type: 'video',
-                        public_id: `video_${videoId}`,
-                        overwrite: true
-                    });
-
-                    console.log(`Uploaded video to Cloudinary at ${uploadResult.secure_url}`);
-
-                    // Clean up: delete the temporary video file
-                    fs.unlinkSync(tempFilePath);
-                    console.log(`Deleted temporary video file: ${tempFilePath}`);
-
-                    resolve(uploadResult.secure_url); // Return the Cloudinary URL
-                } catch (err) {
-                    console.error(`Error uploading video to Cloudinary: ${err}`);
-                    reject(err);
-                }
-            })
-            .on('error', (err) => {
-                console.error(`Error downloading video: ${err}`);
-                reject(err);
-            });
-    });
 };
 
 // Handle form submit
@@ -91,8 +76,8 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't transcribe the Audio.");
         }
 
-        console.log('Downloading and uploading video');
-        const cloudinaryUrl = await downloadAndUploadVideo(formData.link, videoId);
+        console.log('Streaming video to Cloudinary');
+        const cloudinaryUrl = await streamVideoToCloudinary(formData.link, videoId);
 
         console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({
@@ -199,7 +184,7 @@ handleInitialFormSubmit.maxDuration = 300;
 
 export const checkFacts = async (
     formData: z.infer<typeof VerifyFactsFormSchema>
-) => {
+): Promise<FactCheckerResponse | null> => {
     try {
         console.log('Checking facts');
         const res = await searchUsingTavilly(formData.summary);
