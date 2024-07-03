@@ -122,6 +122,7 @@ model Post {
   votes       Vote[]
   tags        PostTag[] // Relation to PostTag for many-to-many relationship
   slug        String?
+  thumbnail   String?
 
   @@index([authorId])
   @@index([subredditId])

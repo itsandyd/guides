@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { formSchema } from "@/components/admin/initialForm";
 import { VerifyFactsFormSchema } from "@/components/admin/verifyFacts";
 import { searchUsingTavilly } from "./search";
+import OpenAI from "openai";
 
 // Configure Cloudinary
 cloudinary.config({ 
@@ -25,10 +26,15 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
                 resource_type: 'video',
                 public_id: `video_${videoId}`,
                 overwrite: true,
-                eager:     {
-                    width: 1280,
-                    height: 720,
-                },
+                eager: [
+                    {
+                        width: 1920,
+                        height: 1080,
+                        crop: 'fit',
+                        format: 'mp4',
+                        quality: 'auto'
+                    }
+                ],
                 eager_async: true
             },
             (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
@@ -55,7 +61,7 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
 const captureScreenshotsFromCloudinary = async (videoId: string, videoDuration: number): Promise<string[]> => {
     const screenshotUrls: string[] = [];
 
-    for (let i = 0; i < videoDuration; i += 2) {
+    for (let i = 0; i < videoDuration; i += 30) {
         const screenshotUrl = cloudinary.url(`video_${videoId}.jpg`, {
             resource_type: 'video',
             transformation: [
@@ -70,9 +76,44 @@ const captureScreenshotsFromCloudinary = async (videoId: string, videoDuration: 
     return screenshotUrls;
 };
 
-const generateCaptionForScreenshot = async (screenshotUrl: string): Promise<string> => {
-    // Replace this with your caption generation logic
-    return `Caption for ${screenshotUrl}`;
+
+  const openai = new OpenAI();
+  
+  const generateCaptionForScreenshot = async (screenshotUrl: string): Promise<string> => {
+    try {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        {
+                            "type": "text",
+                            "text": "Please generate a detailed caption describing what is shown in the provided image."
+                        },
+                        {
+                            "type": "image_url", 
+                            "image_url": {
+                                "url": screenshotUrl
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens: 100,
+        });
+
+        const choice = response.choices?.[0]?.message?.content?.trim();
+        if (choice) {
+            return choice;
+        } else {
+            console.error("Unexpected response from OpenAI API:", response);
+            return "Error generating caption.";
+        }
+    } catch (error) {
+        console.error("Error calling OpenAI API:", error);
+        return "Error generating caption.";
+    }
 };
 
 // Define FactCheckerResponse type

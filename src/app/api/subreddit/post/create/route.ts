@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    const { title, content, subredditId } = PostValidator.parse(body)
+    const { title, content, description, thumbnail, subredditId } = PostValidator.parse(body)
 
     const session = await getAuthSession()
 
@@ -31,6 +31,8 @@ export async function POST(req: Request) {
       data: {
         title,
         content,
+        description,
+        thumbnail,
         authorId: session.user.id,
         subredditId,
       },

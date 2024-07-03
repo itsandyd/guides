@@ -11,6 +11,9 @@ export const PostValidator = z.object({
     }),
   subredditId: z.string(),
   content: z.any(),
+  description: z.string().optional(),
+  author: z.string().optional(),
+  thumbnail: z.string().url().optional(),
   // tags: z.array(z.string()),
 })
 

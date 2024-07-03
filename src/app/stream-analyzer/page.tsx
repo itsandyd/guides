@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Hero from '@/components/guidecraft/hero'
 import LatestPosts from '@/components/guidecraft/latest-posts'
-import Component from '@/components/guidecraft/landing'
+import Component from '@/components/stream-analyzer/landing'
 import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'

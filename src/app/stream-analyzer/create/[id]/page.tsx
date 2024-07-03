@@ -60,10 +60,6 @@ export default async function SummaryIndexPage({ params }: Props) {
         },
     });
 
-    const subreddits = await db.subreddit.findMany({
-        select: { id: true, name: true },
-    });
-
     if (!data) {
         return (
             <section className="container mt-40 flex items-center">
@@ -128,12 +124,12 @@ export default async function SummaryIndexPage({ params }: Props) {
                         </>
 
                 </div> */}
-             <CreatePost
+                <CreatePost
                     title={videoInfo.videoDetails.title}
                     content={data.summary}
                     description={videoInfo.videoDetails.description || ""}
+                    author={videoInfo.videoDetails.author.name}
                     thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
-                    subreddits={subreddits} // Pass subreddits to CreatePost
                 />
                 {/* <VerifyFacts summary={data.summary} /> */}
                 {/* <div className="mb-8">
