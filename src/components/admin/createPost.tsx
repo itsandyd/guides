@@ -9,7 +9,7 @@ import axios from "axios";
 import { CreatePostFormSchema } from "@/lib/schema";
 import { Input } from "../ui/Input";
 import { Textarea } from "../ui/Textarea";
-import { Select, SelectItem } from "../ui/select";
+import { Select, SelectItem, SelectContent, SelectTrigger } from "../ui/select"; // Import Select components
 
 interface CreatePostProps {
     title: string;
@@ -61,15 +61,15 @@ export const CreatePost: React.FC<CreatePostProps> = ({ title, content, descript
                 {...form.register("thumbnail")}
                 placeholder="Enter thumbnail URL"
             />
-     <Select
-                {...form.register("subredditId")}
-                // placeholder="Select subreddit"
-            >
-                {subreddits.map((subreddit) => (
-                    <SelectItem key={subreddit.id} value={subreddit.id}>
-                        {subreddit.name}
-                    </SelectItem>
-                ))}
+            <Select {...form.register("subredditId")}>
+                <SelectTrigger placeholder="Select subreddit" />
+                <SelectContent>
+                    {subreddits.map((subreddit) => (
+                        <SelectItem key={subreddit.id} value={subreddit.id}>
+                            {subreddit.name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
             </Select>
             <Button type="submit" disabled={form.formState.isSubmitting}>
                 Create Post
