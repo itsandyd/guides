@@ -25,16 +25,6 @@ const streamVideoToCloudinary = async (url: string, videoId: string): Promise<st
                 resource_type: 'video',
                 public_id: `video_${videoId}`,
                 overwrite: true,
-                // timeout: 300000,
-                eager: [
-                    {
-                        width: 1280,
-                        height: 720,
-                        crop: 'fit',
-                        format: 'mp4',
-                        // quality: 'auto'
-                    }
-                ]
             },
             (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
                 if (error || !result) {
