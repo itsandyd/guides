@@ -18,9 +18,11 @@ export default async function Home() {
   const session = await getAuthSession()
 
   return (
-    <div className="">
+    <div className="container mx-auto px-4 py-8">
       <Hero />
-      <LatestPosts />
+      <div className="mt-16">
+        <LatestPosts />
+      </div>
       {/* <Component /> */}
     </div>
   )

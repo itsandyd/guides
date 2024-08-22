@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { formSchema } from "@/components/admin/initialForm";
 import { VerifyFactsFormSchema } from "@/components/admin/verifyFacts";
 import { searchUsingTavilly } from "./search";
+import AWS from 'aws-sdk';
 
 // Configure Cloudinary
 cloudinary.config({ 
@@ -18,39 +19,76 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const streamVideoToCloudinary = async (url: string, videoId: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                resource_type: 'video',
-                public_id: `video_${videoId}`,
-                overwrite: true,
-                eager:     {
-                    width: 1280,
-                    height: 720,
-                },
-                eager_async: true
-            },
-            (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-                if (error || !result) {
-                    console.error('Error uploading video to Cloudinary:', error || 'Upload result is undefined');
-                    reject(error || new Error('Upload result is undefined'));
-                } else {
-                    console.log(`Uploaded video to Cloudinary at ${result.secure_url}`);
-                    resolve(result.secure_url); // Return the Cloudinary URL
-                }
-            }
-        );
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
 
-        // Stream the video to Cloudinary
-        ytdl(url, { quality: 'highest' })
-            .pipe(uploadStream)
-            .on('error', (err) => {
-                console.error('Error downloading video:', err);
+const streamVideoToS3 = async (url: string, bucketName: string, key: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const videoStream = ytdl(url, { quality: 'lowest' });
+        const uploadParams = {
+            Bucket: bucketName,
+            Key: key,
+            Body: videoStream,
+            ContentType: 'video/mp4',
+        };
+
+        s3.upload(uploadParams, (err: any, data: any) => {
+            if (err) {
+                if (err.statusCode === 403) {
+                    console.error('Error uploading video to S3: Access Denied (403)');
+                } else {
+                    console.error(`Error uploading video to S3: ${err.message}`);
+                }
                 reject(err);
-            });
+            } else {
+                console.log(`Uploaded video to S3 at ${data.Location}`);
+                resolve(data.Location);
+            }
+        });
+
+        videoStream.on('error', (err) => {
+            console.error(`Error downloading video: ${err.message}`);
+            reject(err);
+        });
     });
 };
+
+// const streamVideoToCloudinary = async (url: string, videoId: string): Promise<string> => {
+//     return new Promise((resolve, reject) => {
+//         const uploadStream = cloudinary.uploader.upload_stream(
+//             {
+//                 resource_type: 'video',
+//                 public_id: `video_${videoId}`,
+//                 overwrite: true,
+//                 eager:     {
+//                     width: 1280,
+//                     height: 720,
+//                 },
+//                 eager_async: true,
+//                 timeout: 5000000
+//             },
+//             (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+//                 if (error || !result) {
+//                     console.error('Error uploading video to Cloudinary:', error || 'Upload result is undefined');
+//                     reject(error || new Error('Upload result is undefined'));
+//                 } else {
+//                     console.log(`Uploaded video to Cloudinary at ${result.secure_url}`);
+//                     resolve(result.secure_url); // Return the Cloudinary URL
+//                 }
+//             }
+//         );
+
+//         // Stream the video to Cloudinary
+//         ytdl(url, { quality: 'highest' })
+//             .pipe(uploadStream)
+//             .on('error', (err) => {
+//                 console.error('Error downloading video:', err);
+//                 reject(err);
+//             });
+//     });
+// };
 
 const captureScreenshotsFromCloudinary = async (videoId: string, videoDuration: number): Promise<string[]> => {
     const screenshotUrls: string[] = [];
@@ -105,30 +143,33 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't transcribe the Audio.");
         }
 
-        console.log('Streaming video to Cloudinary');
-        const cloudinaryUrl = await streamVideoToCloudinary(formData.link, videoId);
+        // console.log('Streaming video to Cloudinary');
+        // const cloudinaryUrl = await streamVideoToCloudinary(formData.link, videoId);
+
+        console.log('Streaming video to S3');
+        const s3Url = await streamVideoToS3(formData.link, process.env.AWS_S3_BUCKET_NAME!, `videos/${videoId}.mp4`);
 
         console.log('Capturing screenshots from Cloudinary');
         const screenshotUrls = await captureScreenshotsFromCloudinary(videoId, videoDuration);
 
-        console.log('Saving screenshots to database');
-        for (const [index, screenshotUrl] of Array.from(screenshotUrls.entries())) {
-            try {
-                const caption = await generateCaptionForScreenshot(screenshotUrl);
-                console.log(`Saving screenshot ${index + 1} with URL ${screenshotUrl}`);
-                await db.screenshot.create({
-                    data: {
-                        videoId: videoId,
-                        filename: `screenshot-${index + 1}.jpg`,
-                        url: screenshotUrl,
-                        caption: caption
-                    }
-                });
-                console.log(`Saved screenshot ${index + 1} to database`);
-            } catch (error) {
-                console.error(`Error saving screenshot ${index + 1} to database: ${error}`);
-            }
-        }
+        // console.log('Saving screenshots to database');
+        // for (const [index, screenshotUrl] of Array.from(screenshotUrls.entries())) {
+        //     try {
+        //         const caption = await generateCaptionForScreenshot(screenshotUrl);
+        //         console.log(`Saving screenshot ${index + 1} with URL ${screenshotUrl}`);
+        //         await db.screenshot.create({
+        //             data: {
+        //                 videoId: videoId,
+        //                 filename: `screenshot-${index + 1}.jpg`,
+        //                 url: screenshotUrl,
+        //                 caption: caption
+        //             }
+        //         });
+        //         console.log(`Saved screenshot ${index + 1} to database`);
+        //     } catch (error) {
+        //         console.error(`Error saving screenshot ${index + 1} to database: ${error}`);
+        //     }
+        // }
 
         console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({
