@@ -58,12 +58,13 @@ model User {
 
   username String? @unique
 
-  image       String?
-  accounts    Account[]
-  sessions    Session[]
-  Post        Post[]
-  Comment     Comment[]
-  CommentVote CommentVote[]
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  Post             Post[]
+  Comment          Comment[]
+  CommentVote      CommentVote[]
+  createdRaidTeams RaidTeam[]
 }
 
 model Game {
@@ -230,4 +231,25 @@ model Summary {
   video Video @relation(fields: [videoid], references: [videoid], onDelete: Cascade)
 
   @@index([videoid])
+}
+
+model RaidTeam {
+  id              String   @id @default(cuid())
+  name            String
+  about           String   @db.Text
+  aboutDetailed   String?  @db.Text
+  schedule        String
+  roles           Json
+  progress        String
+  requirements    String?
+  classesAndSpecs Json?
+  leaderName      String // New field
+  contactInfo     String // New field
+  creatorId       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  creator User @relation(fields: [creatorId], references: [id])
+
+  @@index([creatorId])
 }
