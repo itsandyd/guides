@@ -174,10 +174,19 @@ const RaidTeamFinder: React.FC = () => {
 
         try {
             await axios.delete(`/api/raid-teams/${teamId}`);
-            setTeams(teams.filter(t => t.id !== teamId));
+            setTeams(prevTeams => prevTeams.filter(t => t.id !== teamId));
+            toast({
+                title: "Team Deleted",
+                description: "The raid team has been successfully deleted.",
+                variant: "default",
+            });
         } catch (error) {
             console.error('Error deleting team:', error);
-            // You might want to show an error toast here
+            toast({
+                title: "Error",
+                description: "There was an error deleting the team. Please try again.",
+                variant: "destructive",
+            });
         }
     };
 

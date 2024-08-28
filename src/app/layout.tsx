@@ -36,7 +36,7 @@ export default function RootLayout({
           <Navbar />
           {authModal}
 
-          <div className='h-full'>
+          <div className='h-full' >
             {children}
           </div>
         </Providers>
