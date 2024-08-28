@@ -36,11 +36,8 @@ export default function RaidTeamsLayout({
     children: React.ReactNode
 }) {
     return (
-        <section>
-            {/* You can add any common UI elements for all raid team pages here */}
-            <div className="container mx-auto px-4 py-8">
+            <div>
                 {children}
             </div>
-        </section>
     )
 }
