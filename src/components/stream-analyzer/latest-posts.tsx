@@ -4,7 +4,7 @@ import getLatestPosts from '@/actions/latest-posts';
 import React, { useEffect, useState } from 'react';
 import { PostCard } from './post-card';
 import Link from 'next/link';
-import { Card, CardHeader, CardTitle } from '../ui/Card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
 import { cn } from '@/lib/utils';
 
 type Tag = {
@@ -42,23 +42,31 @@ const LatestPosts = () => {
   }, []);
 
   return (
-    <div>
+    <div className="space-y-12">
       {latestPosts.map(({ subredditName, latestPosts }) => (
-        <div key={subredditName} className="flex flex-col space-y-1.5 p-6">
-          <h2 className="text-2xl font-semibold leading-none tracking-tight mb-4">Latest Posts in {subredditName}</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
+        <div key={subredditName}>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-6">{subredditName}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {latestPosts.map((post) => (
               <Link href={`/guides/${subredditName}/post/${post.id}`} key={post.id}>
-                <Card>
+                <Card className="transition-all duration-200 hover:scale-105 hover:shadow-lg">
                   <CardHeader>
-                    <CardTitle>{post.title}</CardTitle>
+                    <CardTitle className="text-lg font-semibold line-clamp-2">{post.title}</CardTitle>
                   </CardHeader>
-                  {/* <CardContent>
-                    Insert content here
+                  <CardContent className="mt-2">
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {/* Insert content preview or excerpt here */}
+                    </p>
                   </CardContent>
-                  <CardFooter>
-                    Insert footer here
-                  </CardFooter> */}
+                  <CardFooter className="mt-4">
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(post.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </CardFooter>
                 </Card>
               </Link>
             ))}
