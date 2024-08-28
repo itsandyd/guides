@@ -469,7 +469,7 @@ const TeamForm: React.FC<TeamFormProps> = ({ team, onSave }) => {
                                 </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
-                                <Textarea 
+                                <Input 
                                     id="aboutDetailed" 
                                     name="aboutDetailed" 
                                     value={formData.aboutDetailed || ''} 
