@@ -75,7 +75,7 @@ const streamToBuffer = (stream: any): Promise<Buffer> => {
         })
 
         stream.on("end", () => {
-            const buffer = Buffer.concat(chunks)
+            const buffer = Buffer.concat(chunks as any)
             resolve(buffer)
         })
 

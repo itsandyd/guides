@@ -7,10 +7,12 @@ import { redis } from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
 import { CachedPost } from '@/types/redis'
 import { Post, Prisma, User, Vote } from '@prisma/client'
-import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
+import { ArrowBigDown, ArrowBigUp, Loader2, Trash2 } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
+import { getAuthSession } from '@/lib/auth'
+import DeletePostButton from '@/components/DeletePostButton'
 
 interface SubRedditPostPageProps {
   params: {
@@ -101,6 +103,9 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
 
   if (!post && !cachedPost) return notFound()
 
+  const authSession = await getAuthSession()
+  const isAuthor = post?.author.id === authSession?.user?.id
+
   return (
     <div>
       <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
@@ -138,6 +143,10 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             {/* @ts-expect-error Server Component */}
             <CommentsSection postId={post?.id ?? cachedPost.id} />
           </Suspense>
+
+          {isAuthor && (
+            <DeletePostButton postId={post?.id ?? cachedPost.id} />
+          )}
         </div>
       </div>
     </div>
