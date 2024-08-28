@@ -144,11 +144,11 @@ export const handleInitialFormSubmit = async (
             throw new Error("Couldn't transcribe the Audio.");
         }
 
-        console.log('Streaming video to S3');
-        const s3Url = await streamVideoToS3(formData.link, process.env.AWS_S3_BUCKET_NAME!, `videos/${videoId}.mp4`);
+        // console.log('Streaming video to S3');
+        // const s3Url = await streamVideoToS3(formData.link, process.env.AWS_S3_BUCKET_NAME!, `videos/${videoId}.mp4`);
 
-        console.log('Capturing screenshots from Cloudinary');
-        const screenshotUrls = await captureScreenshotsFromCloudinary(videoId, videoDuration);
+        // console.log('Capturing screenshots from Cloudinary');
+        // const screenshotUrls = await captureScreenshotsFromCloudinary(videoId, videoDuration);
 
         console.log('Checking if video already exists in database');
         const existingVideo = await db.video.findUnique({

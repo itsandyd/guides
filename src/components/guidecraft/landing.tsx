@@ -307,7 +307,7 @@ import { Button } from "../ui/Button"
 //   )
 // }
 
-export default function Component() {
+export default function GuideCraftLanding() {
     return (
       <div className="flex flex-col min-h-dvh bg-gray-900 text-white">
         <header className="relative overflow-hidden">

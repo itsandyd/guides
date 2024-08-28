@@ -10,6 +10,7 @@ import Hero from '@/components/guidecraft/hero'
 import LatestPosts from '@/components/guidecraft/latest-posts'
 import Component from '@/components/guidecraft/landing'
 import { Metadata } from 'next'
+import GuideCraftLanding from '@/components/guidecraft/landing'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -79,7 +80,7 @@ export default async function Home() {
 
   return (
     <div className="bg-[#1a1a1a] text-white">
-      <Component />
+      <GuideCraftLanding />
     </div>
   )
 }

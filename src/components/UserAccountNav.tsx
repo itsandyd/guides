@@ -43,16 +43,16 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           <Link href='/feed'>Feed</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem asChild>
+        {/* <DropdownMenuItem asChild>
           <Link href='/categories/create'>Create Category</Link>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem asChild>
           <Link href='/settings'>Settings</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        {/* <DropdownMenuItem asChild>
           <Link href='https://discord.gg/sVPGxbnM'>Join our Discord</Link>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className='cursor-pointer'
