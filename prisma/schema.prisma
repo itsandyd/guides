@@ -16,6 +16,12 @@ enum VoteType {
   DOWN
 }
 
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -65,6 +71,7 @@ model User {
   Comment          Comment[]
   CommentVote      CommentVote[]
   createdRaidTeams RaidTeam[]
+  applications     Application[]
 }
 
 model Game {
@@ -234,22 +241,44 @@ model Summary {
 }
 
 model RaidTeam {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   name            String
-  about           String   @db.Text
-  aboutDetailed   String?  @db.Text
+  about           String        @db.Text
+  aboutDetailed   String?       @db.Text
   schedule        String
   roles           Json
   progress        String
   requirements    String?
   classesAndSpecs Json?
-  leaderName      String // New field
-  contactInfo     String // New field
+  leaderName      String
+  contactInfo     String
   creatorId       String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  applications    Application[]
 
   creator User @relation(fields: [creatorId], references: [id])
 
   @@index([creatorId])
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  applicantId    String
+  teamId         String
+  characterName  String
+  characterClass String
+  characterSpec  String
+  experience     String
+  availability   String
+  additionalInfo String?
+  status         ApplicationStatus @default(PENDING)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  applicant User     @relation(fields: [applicantId], references: [id])
+  team      RaidTeam @relation(fields: [teamId], references: [id])
+
+  @@index([applicantId])
+  @@index([teamId])
 }

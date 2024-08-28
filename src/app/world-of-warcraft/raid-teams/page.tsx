@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Users, Calendar, Plus, Edit } from 'lucide-react';
+import { Search, Filter, Users, Calendar, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog';
 import axios from 'axios';
 import { Label } from '@/components/ui/Label';
@@ -15,6 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/Textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation';
 
 interface Team {
     id?: string;
@@ -111,6 +113,11 @@ const RaidTeamFinder: React.FC = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { loginToast } = useCustomToasts();
     const { data: session } = useSession();
+    const [applyingToTeam, setApplyingToTeam] = useState<Team | null>(null);
+    const { toast } = useToast();
+    const [userApplications, setUserApplications] = useState<Application[]>([]);
+    const router = useRouter();
+    const [reviewingApplications, setReviewingApplications] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -118,7 +125,19 @@ const RaidTeamFinder: React.FC = () => {
             setTeams(response.data);
         };
         fetchTeams();
-    }, []);
+
+        const fetchUserApplications = async () => {
+            if (session?.user?.id) {
+                try {
+                    const response = await axios.get(`/api/raid-teams/applications?userId=${session.user.id}`);
+                    setUserApplications(response.data);
+                } catch (error) {
+                    console.error('Error fetching user applications:', error);
+                }
+            }
+        };
+        fetchUserApplications();
+    }, [session]);
 
     const filteredTeams = teams.filter(team =>
         team.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -162,6 +181,55 @@ const RaidTeamFinder: React.FC = () => {
         }
     };
 
+    const handleApplyToTeam = async (application: TeamApplication) => {
+        if (!session?.user) {
+            loginToast();
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/raid-teams/applications', application);
+            setUserApplications(prevApplications => [...prevApplications, response.data]);
+            toast({
+                title: "Application Submitted",
+                description: "Your application has been sent to the team leader.",
+            });
+            setApplyingToTeam(null);
+        } catch (error) {
+            console.error('Error submitting application:', error);
+            toast({
+                title: "Error",
+                description: "There was an error submitting your application. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleDeleteApplication = async (id: string) => {
+        try {
+            const response = await axios.delete(`/api/raid-teams/applications/${id}`);
+            if (response.status === 200) {
+                setUserApplications(prevApplications => 
+                    prevApplications.filter(app => app.id !== id)
+                );
+                toast({
+                    title: "Application Deleted",
+                    description: "Your application has been successfully deleted.",
+                    variant: "default",
+                });
+            } else {
+                throw new Error('Failed to delete application');
+            }
+        } catch (error) {
+            console.error('Error deleting application:', error);
+            toast({
+                title: "Error",
+                description: "There was an error deleting your application. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
     return (
         <div className="p-4 bg-gray-100 rounded-lg shadow">
             <h2 className="text-2xl font-bold mb-4">Ducky Raid Team Finder</h2>
@@ -193,10 +261,27 @@ const RaidTeamFinder: React.FC = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="space-y-4">
+            <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-4">Your Applications</h3>
+                {userApplications.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {userApplications.map((application) => (
+                            <ApplicationCard 
+                                key={application.id} 
+                                application={application} 
+                                onDelete={handleDeleteApplication}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p>You haven't applied to any teams yet.</p>
+                )}
+            </div>
+            <h3 className="text-xl font-semibold mb-4">Available Teams</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredTeams.map(team => (
                     <div key={team.id} className="bg-white p-4 rounded shadow">
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col h-full">
                             <div>
                                 <h3 className="text-xl font-semibold">{team.name}</h3>
                                 <p className="text-gray-600"><Calendar className="inline h-4 w-4 mr-1" /> {team.schedule}</p>
@@ -206,25 +291,47 @@ const RaidTeamFinder: React.FC = () => {
                                 <p className="text-gray-600"><Filter className="inline h-4 w-4 mr-1" /> {team.progress}</p>
                                 <p className="text-gray-600">Requirements: {team.requirements}</p>
                             </div>
-                            <div className="flex space-x-2">
-                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline" onClick={() => setEditingTeam(team)}>
-                                            <Edit className="h-4 w-4 mr-2" /> Edit
+                            <div className="mt-auto pt-4">
+                                {session?.user?.id === team.creatorId ? (
+                                    <div className="flex space-x-2">
+                                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" onClick={() => setEditingTeam(team)}>
+                                                    <Edit className="h-4 w-4 mr-2" /> Edit
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <TeamForm team={editingTeam} onSave={handleSaveTeam} />
+                                            </DialogContent>
+                                        </Dialog>
+                                        <Button variant="destructive" onClick={() => handleDeleteTeam(team.id!)}>
+                                            Delete
                                         </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <TeamForm team={editingTeam} onSave={handleSaveTeam} />
-                                    </DialogContent>
-                                </Dialog>
-                                {session?.user?.id === team.creatorId && (
-                                    <Button variant="destructive" onClick={() => handleDeleteTeam(team.id!)}>
-                                        Delete
-                                    </Button>
+                                        {team.id && (
+                                            <Dialog open={reviewingApplications === team.id} onOpenChange={(open) => setReviewingApplications(open ? team.id ?? null : null)}>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline">
+                                                        <Eye className="h-4 w-4 mr-2" /> View Applications
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-4xl">
+                                                    <ApplicationReviewForm teamId={team.id} />
+                                                </DialogContent>
+                                            </Dialog>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Dialog open={applyingToTeam?.id === team.id} onOpenChange={(open) => !open && setApplyingToTeam(null)}>
+                                        <DialogTrigger asChild>
+                                            <Button className="w-full" onClick={() => setApplyingToTeam(team)}>Apply to Join</Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <ApplyToTeamForm team={team} onSubmit={handleApplyToTeam} />
+                                        </DialogContent>
+                                    </Dialog>
                                 )}
                             </div>
                         </div>
-                        <Button className="mt-2">Apply to Join</Button>
                     </div>
                 ))}
             </div>
@@ -463,6 +570,288 @@ const TeamForm: React.FC<TeamFormProps> = ({ team, onSave }) => {
                 <Button type="submit">Save Team</Button>
             </DialogFooter>
         </form>
+    );
+};
+
+type WoWClass = keyof typeof classesAndSpecs;
+
+interface TeamApplication {
+    teamId: string;
+    applicantName: string;
+    characterName: string;
+    characterClass: WoWClass;
+    characterSpec: string;
+    experience: string;
+    availability: string;
+    additionalInfo: string;
+}
+
+interface ApplyToTeamFormProps {
+    team: Team;
+    onSubmit: (application: TeamApplication) => void;
+}
+
+const ApplyToTeamForm: React.FC<ApplyToTeamFormProps> = ({ team, onSubmit }) => {
+    const [formData, setFormData] = useState<TeamApplication>({
+        teamId: team.id!,
+        applicantName: "",
+        characterName: "",
+        characterClass: Object.keys(classesAndSpecs)[0] as WoWClass,
+        characterSpec: "",
+        experience: "",
+        availability: "",
+        additionalInfo: "",
+    });
+    const [isExperienceExpanded, setIsExperienceExpanded] = useState(false);
+    const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleClassChange = (value: string) => {
+        if (value in classesAndSpecs) {
+            setFormData(prev => ({
+                ...prev,
+                characterClass: value as WoWClass,
+                characterSpec: "",
+            }));
+        }
+    };
+
+    const handleSpecChange = (value: string) => {
+        setFormData(prev => ({ ...prev, characterSpec: value }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(formData);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <DialogHeader>
+                <DialogTitle>Apply to Join {team.name}</DialogTitle>
+                <DialogDescription>
+                    Fill out the application form below to apply for this raid team.
+                </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="h-[60vh] pr-4">
+                <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="applicantName">Your Name</Label>
+                        <Input id="applicantName" name="applicantName" value={formData.applicantName} onChange={handleChange} required />
+                    </div>
+                    <div>
+                        <Label htmlFor="characterName">Character Name</Label>
+                        <Input id="characterName" name="characterName" value={formData.characterName} onChange={handleChange} required />
+                    </div>
+                    <div>
+                        <Label htmlFor="characterClass">Character Class</Label>
+                        <Select 
+                            name="characterClass" 
+                            value={formData.characterClass} 
+                            onValueChange={handleClassChange}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a class" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <ScrollArea className="h-[200px]">
+                                    {(Object.keys(classesAndSpecs) as WoWClass[]).map((className) => (
+                                        <SelectItem key={className} value={className}>{className}</SelectItem>
+                                    ))}
+                                </ScrollArea>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <Label htmlFor="characterSpec">Character Spec</Label>
+                        <Select 
+                            name="characterSpec" 
+                            value={formData.characterSpec} 
+                            onValueChange={handleSpecChange}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a spec" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.keys(classesAndSpecs[formData.characterClass]).map((spec) => (
+                                    <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <Label htmlFor="availability">Availability</Label>
+                        <Input id="availability" name="availability" value={formData.availability} onChange={handleChange} required />
+                    </div>
+                    <div>
+                        <Label htmlFor="experience">Raiding Experience</Label>
+                        <Input 
+                            id="experience" 
+                            name="experience" 
+                            value={formData.experience} 
+                            onChange={handleChange} 
+                            required 
+                            // className="h-20 resize-none"
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="additionalInfo">Additional Information</Label>
+                        <Input 
+                            id="additionalInfo" 
+                            name="additionalInfo" 
+                            value={formData.additionalInfo} 
+                            onChange={handleChange} 
+                            // className="h-20 resize-none"
+                        />
+                    </div>
+                </div>
+            </ScrollArea>
+            <DialogFooter>
+                <Button type="submit">Submit Application</Button>
+            </DialogFooter>
+        </form>
+    );
+};
+
+interface Application {
+    id: string;
+    teamId: string;
+    applicantId: string;
+    characterName: string;
+    characterClass: string;
+    characterSpec: string;
+    experience: string;
+    availability: string;
+    additionalInfo?: string;
+    status: 'PENDING' | 'APPROVED' | 'DECLINED';
+    createdAt: string;
+    updatedAt: string;
+    team?: {
+        id: string;
+        name: string;
+    };
+}
+
+const ApplicationCard: React.FC<{ application: Application, onDelete: (id: string) => void }> = ({ application, onDelete }) => {
+    const { toast } = useToast();
+
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this application?')) {
+            try {
+                await axios.delete(`/api/raid-teams/applications/${application.id}`);
+                onDelete(application.id);
+                toast({
+                    title: "Application Deleted",
+                    description: "Your application has been successfully deleted.",
+                    variant: "default",
+                });
+            } catch (error) {
+                console.error('Error deleting application:', error);
+                toast({
+                    title: "Error",
+                    description: "There was an error deleting your application. Please try again.",
+                    variant: "destructive",
+                });
+            }
+        }
+    };
+
+    return (
+        <div className="bg-white p-4 rounded shadow">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h4 className="text-lg font-semibold">{application.team?.name || 'Unknown Team'}</h4>
+                    <p>Character: {application.characterName} - {application.characterClass} ({application.characterSpec})</p>
+                    <p>Status: {application.status}</p>
+                    <p>Applied on: {new Date(application.createdAt).toLocaleDateString()}</p>
+                </div>
+                <Button variant="destructive" size="sm" onClick={handleDelete}>
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+interface ApplicationReviewFormProps {
+    teamId: string;
+}
+
+const ApplicationReviewForm: React.FC<ApplicationReviewFormProps> = ({ teamId }) => {
+    const [applications, setApplications] = useState<Application[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        const fetchApplications = async () => {
+            try {
+                const response = await axios.get(`/api/raid-teams/${teamId}/applications`);
+                setApplications(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching applications:', error);
+                toast({
+                    title: "Error",
+                    description: "Failed to fetch applications. Please try again.",
+                    variant: "destructive",
+                });
+                setLoading(false);
+            }
+        };
+
+        fetchApplications();
+    }, [teamId]);
+
+    const handleUpdateStatus = async (applicationId: string, newStatus: 'APPROVED' | 'DECLINED' | 'PENDING') => {
+        try {
+            await axios.patch(`/api/raid-teams/applications/${applicationId}`, { status: newStatus });
+            setApplications(apps => apps.map(app => 
+                app.id === applicationId ? { ...app, status: newStatus } : app
+            ));
+            toast({
+                title: "Status Updated",
+                description: `Application status updated to ${newStatus.toLowerCase()}.`,
+            });
+        } catch (error) {
+            console.error('Error updating application status:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update application status. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    if (loading) {
+        return <div>Loading applications...</div>;
+    }
+
+    return (
+        <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Review Applications</h2>
+            {applications.length === 0 ? (
+                <p>No applications to review.</p>
+            ) : (
+                applications.map(app => (
+                    <div key={app.id} className="bg-gray-100 p-4 rounded">
+                        <h3 className="text-lg font-semibold">{app.characterName} - {app.characterClass} ({app.characterSpec})</h3>
+                        <p>Experience: {app.experience}</p>
+                        <p>Availability: {app.availability}</p>
+                        {app.additionalInfo && <p>Additional Info: {app.additionalInfo}</p>}
+                        <p>Status: {app.status}</p>
+                        <div className="mt-2 space-x-2">
+                            <Button onClick={() => handleUpdateStatus(app.id, 'APPROVED')} disabled={app.status === 'APPROVED'}>Approve</Button>
+                            <Button onClick={() => handleUpdateStatus(app.id, 'DECLINED')} disabled={app.status === 'DECLINED'}>Decline</Button>
+                            <Button onClick={() => handleUpdateStatus(app.id, 'PENDING')} disabled={app.status === 'PENDING'}>Mark as Pending</Button>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
     );
 };
 
