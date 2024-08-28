@@ -159,7 +159,7 @@ const RaidTeamFinder: React.FC = () => {
                 setTeams([...teams, response.data]);
             }
             setEditingTeam(undefined);
-            setIsDialogOpen(false); // Close the dialog after successful save
+            setIsDialogOpen(false);
         } catch (error) {
             console.error('Error saving team:', error);
             // You might want to show an error toast here
