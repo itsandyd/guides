@@ -19,7 +19,7 @@ export default function Home() {
       <UserBenefits />
       <FeaturedContent />
       <Testimonials />
-      <LatestPosts />
+      {/* <LatestPosts /> */}
       <section className="py-12 text-center">
         <h2 className="text-3xl font-bold mb-4">Join Our Growing Community</h2>
         <p className="text-xl mb-6">
@@ -29,7 +29,7 @@ export default function Home() {
           <Link href="/guides">Start Exploring Guides</Link>
         </Button>
       </section>
-      <Newsletter />
+      {/* <Newsletter /> */}
     </div>
   )
 }
