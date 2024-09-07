@@ -476,7 +476,7 @@ const TeamForm: React.FC<TeamFormProps> = ({ team, onSave }) => {
                                     onChange={handleChange} 
                                     placeholder="Provide more details about your team, goals, and raid atmosphere..."
                                     className="mt-2"
-                                    rows={4}
+                                    // rows={4}
                                 />
                             </CollapsibleContent>
                         </Collapsible>
