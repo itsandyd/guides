@@ -79,7 +79,7 @@ export default function FeaturedContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">{post.description}</p>
-                <p className="text-xs mt-2">By {post.author.name} in r/{post.subreddit.name}</p>
+                {/* <p className="text-xs mt-2">By {post.} in r/{post.subreddit.name}</p> */}
               </CardContent>
             </Card>
           </Link>
