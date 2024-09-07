@@ -30,11 +30,11 @@ const Navbar = async () => {
               Guide Categories
             </Button>
           </Link>
-          <Link href="/guidecraft">
+          {/* <Link href="/guidecraft">
             <Button variant="ghost" className="rounded-full">
               GuideCraft
             </Button>
-          </Link>
+          </Link> */}
           <Link href="https://emotemaker.ai">
             <Button variant="ghost" className="rounded-full">
               AI Emote Generation

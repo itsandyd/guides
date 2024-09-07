@@ -1,29 +1,35 @@
-import CustomFeed from '@/components/homepage/CustomFeed'
-import GeneralFeed from '@/components/homepage/GeneralFeed'
-import { buttonVariants } from '@/components/ui/Button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
-import { getAuthSession } from '@/lib/auth'
-import { Home as HomeIcon } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import Feed from './feed/page'
 import Hero from '@/components/guidecraft/hero'
+import PopularGames from '@/components/guidecraft/PopularGames'
+import UserBenefits from '@/components/guidecraft/UserBenefits'
+import FeaturedContent from '@/components/guidecraft/FeaturedContent'
 import LatestPosts from '@/components/guidecraft/latest-posts'
-import Component from '@/components/guidecraft/landing'
+import Newsletter from '@/components/guidecraft/Newsletter'
+import Testimonials from '@/components/guidecraft/Testimonials'
+import { Button } from '@/components/ui/Button'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
-export default async function Home() {
-  const session = await getAuthSession()
-
+export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Hero />
-      <div className="mt-16">
-        <LatestPosts />
-      </div>
-      {/* <Component /> */}
+      <PopularGames />
+      <UserBenefits />
+      <FeaturedContent />
+      <Testimonials />
+      <LatestPosts />
+      <section className="py-12 text-center">
+        <h2 className="text-3xl font-bold mb-4">Join Our Growing Community</h2>
+        <p className="text-xl mb-6">
+          <span className="font-bold">10,000+</span> guides available | <span className="font-bold">100,000+</span> active users
+        </p>
+        <Button size="lg" asChild>
+          <Link href="/guides">Start Exploring Guides</Link>
+        </Button>
+      </section>
+      <Newsletter />
     </div>
   )
 }
