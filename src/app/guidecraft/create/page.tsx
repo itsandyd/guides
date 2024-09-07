@@ -15,7 +15,7 @@ export default async function CreatePage() {
             </p>
           </div>
           <div className="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-6 md:p-8 lg:p-10 space-y-6 flex items-center justify-center">
-            <InitialForm />
+          <InitialForm />
           </div>
         </div>
       </div>

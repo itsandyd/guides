@@ -12,6 +12,7 @@ import { VerifyFactsFormSchema } from "@/components/admin/verifyFacts";
 import { searchUsingTavilly } from "./search";
 import OpenAI from "openai";
 import AWS from 'aws-sdk';
+import { YouTubeVideo } from "@/types/youtube";
 
 // Configure Cloudinary
 cloudinary.config({ 
@@ -130,11 +131,25 @@ export const handleInitialFormSubmit = async (
     const start = Date.now();
     try {
         console.log('Fetching video info');
-        const videoInfo = await ytdl.getInfo(formData.link);
-        const videoId = videoInfo.videoDetails.videoId;
-        const videoTitle = videoInfo.videoDetails.title;
-        const videoDescription = videoInfo.videoDetails.description || "No description available";
-        const videoDuration = parseInt(videoInfo.videoDetails.lengthSeconds); // Get video duration in seconds
+        let videoInfo: YouTubeVideo;
+        try {
+            const info = await ytdl.getInfo(formData.link);
+            videoInfo = {
+                videoId: info.videoDetails.videoId,
+                title: info.videoDetails.title,
+                description: info.videoDetails.description || "No description available",
+                duration: parseInt(info.videoDetails.lengthSeconds)
+            };
+        } catch (error: any) {
+            if (error.statusCode === 410) {
+                console.error('Error 410: The video information is no longer available. This might be due to changes in YouTube\'s system.');
+                videoInfo = await fetchVideoInfoFallback(formData.link);
+            } else {
+                throw error;
+            }
+        }
+
+        const { videoId, title: videoTitle, description: videoDescription, duration: videoDuration } = videoInfo;
 
         console.log('Transcribing video');
         const transcript = await transcribeVideo(formData.link);
@@ -205,7 +220,7 @@ export const handleInitialFormSubmit = async (
         await db.video.create({
             data: {
                 videoid: videoId,
-                videotitle: videoInfo.videoDetails.title,
+                videotitle: videoTitle, // Changed from videoInfo.videoDetails.title
                 transcript: transcript,
             }
         });
@@ -275,4 +290,12 @@ export const checkFacts = async (
         return null;
     }
 }
-    
+
+// Add this function to implement a fallback method for fetching video info
+async function fetchVideoInfoFallback(videoUrl: string): Promise<YouTubeVideo> {
+    // Implement an alternative method to fetch video info
+    // This could use YouTube's official API or another library
+    // For now, we'll throw an error
+    throw new Error("Fallback method for fetching video info not implemented");
+}
+
