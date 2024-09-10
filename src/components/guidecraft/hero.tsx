@@ -3,7 +3,7 @@ import { Input } from "../ui/Input";
 
 export default function Hero() {
   return (
-    <header className="container mx-auto px-4 py-16 bg-background text-foreground">
+    <header className="container mx-auto px-4 py-16 bg-gradient-to-b from-background to-background/80 text-foreground">
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">Find Expert Guides for Your Favorite Games</h1>
       <p className="text-xl md:text-2xl text-center text-muted-foreground mb-12">
         Discover strategies, tips, and tricks for World of Warcraft, Runescape, League of Legends, Path of Exile, and more!

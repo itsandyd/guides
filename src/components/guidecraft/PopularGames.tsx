@@ -10,9 +10,10 @@ async function getPopularSubreddits() {
     return await db.subreddit.findMany({
       take: 4,
       orderBy: {
-        subscribers: {
-          _count: 'desc'
-        }
+        updatedAt: 'desc'  // Sort by last update, most recent first
+                // subscribers: {
+        //   _count: 'desc'
+        // }
       },
       include: {
         game: {
@@ -48,7 +49,11 @@ function SubredditList({ subreddits }: { subreddits: Awaited<ReturnType<typeof g
         ))}
       </div>
       <div className="mt-8 text-center">
-        <Button variant="outline" asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button 
+          variant="outline" 
+          asChild 
+          className="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+        >
           <Link href="/categories">View All Games</Link>
         </Button>
       </div>
