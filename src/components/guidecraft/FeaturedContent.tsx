@@ -63,7 +63,7 @@ export default function FeaturedContent() {
       <h2 className="text-3xl font-bold text-center mb-8">Featured Guides</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {featuredPosts.map((post) => (
-          <Link key={post.id} href={`/r/${post.subreddit.name}/post/${post.id}`}>
+          <Link key={post.id} href={`/guides/${post.subreddit.name}/post/${post.id}`}>
             <Card className="h-full hover:shadow-lg transition-shadow">
               <CardHeader>
                 {post.thumbnail && (
