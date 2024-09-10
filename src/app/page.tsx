@@ -9,9 +9,7 @@ import dynamic from 'next/dynamic'
 
 const MotionDiv = dynamic(() => import('../components/MotionWrapper'), { ssr: false })
 
-// Rename 'dynamic' to 'dynamicConfig' to avoid naming conflict
-export const dynamicConfig = 'force-dynamic'
-export const fetchCache = 'force-no-store'
+// export const revalidate = 0 // This tells Next.js to not cache this page
 
 export default function Home() {
   return (
