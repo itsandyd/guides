@@ -1,90 +1,55 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import Link from 'next/link'
-import Image from 'next/image'
 
-type Post = {
-  id: string
-  title: string
-  description: string
-  thumbnail: string | null
-  author: { name: string }
-  subreddit: { name: string }
+import { Suspense } from 'react'
+import { db } from '../../lib/db'
+import { Card, CardContent } from '../ui/Card'
+
+async function getFeaturedPosts() {
+  try {
+    return await db.post.findMany({
+      take: 4,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        subreddit: true
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching featured posts:', error)
+    return []
+  }
 }
 
-export default function FeaturedContent() {
-  const [featuredPosts, setFeaturedPosts] = useState<Post[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const abortController = new AbortController()
-
-    async function fetchFeaturedPosts() {
-      try {
-        setIsLoading(true)
-        const response = await fetch('/api/featured-posts', {
-          signal: abortController.signal
-        })
-        if (!response.ok) {
-          throw new Error('Failed to fetch featured posts')
-        }
-        const posts = await response.json()
-        setFeaturedPosts(posts)
-        setError(null)
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          setError(err.message)
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchFeaturedPosts()
-
-    return () => {
-      abortController.abort()
-    }
-  }, [])
-
-  if (isLoading) {
-    return <div>Loading featured posts...</div>
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>
-  }
+async function FeaturedContentInner() {
+  const featuredPosts = await getFeaturedPosts()
 
   return (
-    <section className="py-12">
-      <h2 className="text-3xl font-bold text-center mb-8">Featured Guides</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featuredPosts.map((post) => (
-          <Link key={post.id} href={`/guides/${post.subreddit.name}/post/${post.id}`}>
-            <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardHeader>
-                {post.thumbnail && (
-                  <Image 
-                    src={post.thumbnail} 
-                    alt={post.title} 
-                    width={300} 
-                    height={200} 
-                    className="rounded-t-lg"
-                  />
-                )}
-                <CardTitle>{post.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{post.description}</p>
-                {/* <p className="text-xs mt-2">By {post.} in r/{post.subreddit.name}</p> */}
+    <section>
+      <h2 className="text-3xl font-semibold text-center mb-8 text-foreground">Featured Guides</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {featuredPosts.map((post: any) => (
+          <Link href={`/guides/${post.subreddit.name}/post/${post.id}`} key={post.id}>
+            <Card className="bg-card border-border hover:bg-accent transition-colors cursor-pointer h-full">
+              <CardContent className="p-4">
+                <h3 className="text-lg font-medium text-card-foreground">{post.title}</h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {post.description ? post.description.slice(0, 100) + '...' : 'No description available'}
+                </p>
               </CardContent>
             </Card>
           </Link>
         ))}
       </div>
     </section>
+  )
+}
+
+export default function FeaturedContent() {
+  return (
+    <Suspense fallback={<div>Loading featured content...</div>}>
+      {/* @ts-expect-error Server Component */}
+      <FeaturedContentInner />
+    </Suspense>
   )
 }

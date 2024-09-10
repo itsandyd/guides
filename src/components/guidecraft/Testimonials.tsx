@@ -1,31 +1,24 @@
-import { Card, CardContent } from '../ui/Card'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar'
+import { Card, CardContent } from "../ui/Card"
 
 const testimonials = [
-  { name: 'Alex', avatar: '/avatars/alex.jpg', text: 'These guides helped me reach Diamond in LoL!' },
-  { name: 'Sarah', avatar: '/avatars/sarah.jpg', text: 'I finally completed my first WoW Mythic raid thanks to GuidesForGamers!' },
-  { name: 'Mike', avatar: '/avatars/mike.jpg', text: 'The PoE builds here are top-notch. Highly recommended!' },
+  { name: 'Alex', quote: 'These guides helped me reach Diamond in LoL!' },
+  { name: 'Sarah', quote: 'I finally completed my first Mythic+ dungeon thanks to the WoW guides.' },
+  { name: 'Mike', quote: 'The Path of Exile builds here are top-notch. Highly recommended!' },
 ]
 
 export default function Testimonials() {
   return (
-    <section className="py-12 bg-secondary">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">What Our Users Say</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <Card key={testimonial.name}>
-              <CardContent className="flex flex-col items-center text-center p-6">
-                <Avatar className="w-20 h-20 mb-4">
-                  <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                  <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
-                </Avatar>
-                <p className="mb-2">"{testimonial.text}"</p>
-                <p className="font-semibold">{testimonial.name}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+    <section>
+      <h2 className="text-3xl font-semibold text-center mb-8 text-foreground">What Our Users Say</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {testimonials.map(({ name, quote }) => (
+          <Card key={name} className="bg-card border-border">
+            <CardContent className="p-6 text-center">
+              <p className="text-lg mb-4 text-card-foreground">"{quote}"</p>
+              <p className="font-semibold text-muted-foreground">- {name}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </section>
   )

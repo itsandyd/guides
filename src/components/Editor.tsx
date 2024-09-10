@@ -200,7 +200,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, content }) => {
   const { ref: titleRef, ...rest } = register('title')
 
   return (
-    <div className='w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200'>
+    <div className='w-full p-4 bg-background rounded-lg border border-border'>
       <form
         id='subreddit-post-form'
         className='w-fit'
@@ -214,10 +214,10 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, content }) => {
             }}
             {...rest}
             placeholder='Title'
-            className='w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none'
+            className='w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none text-foreground'
           />
           <div id='editor' className='min-h-[500px]' />
-          <p className='text-sm text-gray-500'>
+          <p className='text-sm text-muted-foreground'>
             Use{' '}
             <kbd className='rounded-md border bg-muted px-1 text-xs uppercase'>
               Tab

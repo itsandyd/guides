@@ -1,6 +1,8 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
-import { db } from "@/lib/db"
+
+
 import Link from 'next/link'
+import { db } from "../../lib/db"
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
 
 const CategoriesPage = async () => {
   const subreddits = await db.subreddit.findMany()

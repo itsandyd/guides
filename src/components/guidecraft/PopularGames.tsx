@@ -1,8 +1,9 @@
 import { Suspense } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
+import { db } from '../../lib/db'
+import { Card, CardContent } from '../ui/Card'
 import { Button } from '../ui/Button'
-import { db } from '@/lib/db'
+
 
 async function getPopularSubreddits() {
   try {
@@ -29,34 +30,26 @@ async function getPopularSubreddits() {
 
 function SubredditList({ subreddits }: { subreddits: Awaited<ReturnType<typeof getPopularSubreddits>> }) {
   if (subreddits.length === 0) {
-    return <div>No popular subreddits found.</div>
+    return <div className="text-foreground">No popular subreddits found.</div>
   }
 
   return (
-    <section className="py-12">
-      <h2 className="text-3xl font-bold text-center mb-8">Popular Subreddits</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {subreddits.map((subreddit) => (
-          <Link key={subreddit.id} href={`/guides/${subreddit.name}`} className="group">
-            <div className="relative aspect-square overflow-hidden rounded-lg">
-              {/* <Image
-                src={`/images/${subreddit.name.toLowerCase()}.jpg`}
-                alt={subreddit.name}
-                width={300}
-                height={300}
-                className="object-cover transition-transform group-hover:scale-110"
-              /> */}
-            </div>
-            <h3 className="mt-2 text-lg font-semibold text-center">{subreddit.name}</h3>
-            <p className="text-sm text-center text-gray-600">
-              {subreddit.game ? subreddit.game.name : 'General'}
-            </p>
+    <section>
+      <h2 className="text-3xl font-semibold text-center mb-8 text-foreground">Popular Games</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {subreddits.map((subreddit: any) => (
+          <Link href={`/guides/${subreddit.name}`} key={subreddit.id}>
+            <Card className="bg-card border-border hover:bg-accent transition-colors cursor-pointer">
+              <CardContent className="p-4">
+                <h3 className="text-lg font-medium text-center text-card-foreground">{subreddit.name}</h3>
+              </CardContent>
+            </Card>
           </Link>
         ))}
       </div>
       <div className="mt-8 text-center">
-        <Button variant="outline" asChild>
-          <Link href="/subreddits">View All Subreddits</Link>
+        <Button variant="outline" asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Link href="/categories">View All Games</Link>
         </Button>
       </div>
     </section>

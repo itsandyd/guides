@@ -1,18 +1,20 @@
-import CommentsSection from '@/components/CommentsSection'
-import EditorOutput from '@/components/EditorOutput'
-import PostVoteServer from '@/components/post-vote/PostVoteServer'
-import { buttonVariants } from '@/components/ui/Button'
-import { db } from '@/lib/db'
-import { redis } from '@/lib/redis'
-import { formatTimeToNow } from '@/lib/utils'
-import { CachedPost } from '@/types/redis'
-import { Post, Prisma, User, Vote } from '@prisma/client'
+
 import { ArrowBigDown, ArrowBigUp, Loader2, Trash2 } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { getAuthSession } from '@/lib/auth'
-import DeletePostButton from '@/components/DeletePostButton'
+import { db } from '../../../../../lib/db'
+import { redis } from '../../../../../lib/redis'
+import { getAuthSession } from '../../../../../lib/auth'
+import { formatTimeToNow } from '../../../../../lib/utils'
+import EditorOutput from '../../../../../components/EditorOutput'
+import DeletePostButton from '../../../../../components/DeletePostButton'
+import { buttonVariants } from '../../../../../components/ui/Button'
+import { CachedPost } from '../../../../../types/redis'
+import { Post, User, Vote } from '@prisma/client'
+import PostVoteServer from '@/components/post-vote/PostVoteServer'
+import CommentsSection from '@/components/CommentsSection'
+
 
 interface SubRedditPostPageProps {
   params: {
@@ -132,7 +134,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
           </p>
           <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900'>
-            {post?.title ?? cachedPost.title}
+          {post?.title ?? cachedPost.title}
           </h1>
 
           <EditorOutput content={post?.content ?? cachedPost.content} />

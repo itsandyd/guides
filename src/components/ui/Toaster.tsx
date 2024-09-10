@@ -1,14 +1,10 @@
 'use client'
 
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from '@/components/ui/Toast'
-import { useToast } from '@/hooks/use-toast'
+import { ToastProvider } from "@radix-ui/react-toast"
+import { useToast } from "../../hooks/use-toast"
+import { Toast, ToastClose, ToastDescription, ToastTitle, ToastViewport } from "./Toast"
+
+
 
 export function Toaster() {
   const { toasts } = useToast()

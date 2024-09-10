@@ -28,12 +28,14 @@ const style = {
 
 const EditorOutput: FC<EditorOutputProps> = ({ content }) => {
   return (
-    <Output
-      style={style}
-      className='text-sm'
-      renderers={renderers}
-      data={content}
-    />
+    <div className="text-sm bg-background text-foreground transition-colors duration-200">
+      <Output
+        style={style}
+        className='prose prose-stone dark:prose-invert max-w-none'
+        renderers={renderers}
+        data={content}
+      />
+    </div>
   )
 }
 

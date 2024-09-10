@@ -1,11 +1,11 @@
-import Navbar from '@/components/navigation/Navbar'
-import { cn } from '@/lib/utils'
 import { Inter } from 'next/font/google'
-import Providers from '@/components/Providers'
-import { Toaster } from '@/components/ui/Toaster'
-
-import '@/styles/globals.css'
+import './globals.css'
 import { Metadata } from 'next'
+import { ThemeProvider } from '../components/theme-provider'
+import Providers from '../components/Providers'
+import Navbar from '@/components/navigation/Navbar'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,32 +15,29 @@ export const metadata: Metadata = {
   keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  authModal,
 }: {
   children: React.ReactNode
-  authModal: React.ReactNode
 }) {
-  return (
-    <html
-      lang='en'
-      className={cn(
-        // 'bg-white text-slate-900 light',
-        inter.className
-      )}>
-      <body className=''>
-      {/* bg-slate-50 */}
-        <Providers>
-          {/* @ts-expect-error Server Component */}
-          <Navbar />
-          {authModal}
+  const session = await getServerSession(authOptions)
 
-          <div className='h-full' >
-            {children}
-          </div>
-        </Providers>
-        <Toaster />
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <Navbar />
+            <main className="dark:bg-[#1a1a1a] dark:text-white min-h-screen">
+              {children}
+            </main>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   )
