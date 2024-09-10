@@ -17,7 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
-import { Metadata } from 'next';
+import { useTheme } from 'next-themes';
 
 interface Team {
     id?: string;
@@ -107,6 +107,7 @@ const classesAndSpecs = {
 };
 
 const RaidTeamFinder: React.FC = () => {
+    const { theme } = useTheme();
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filterProgress, setFilterProgress] = useState<string>("all");
     const [teams, setTeams] = useState<Team[]>([]);
@@ -241,35 +242,41 @@ const RaidTeamFinder: React.FC = () => {
     };
 
     return (
-        <div className="p-4 bg-gray-100 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Ducky Raid Team Finder</h2>
-            <div className="flex mb-4 space-x-2">
-                <Input
-                    type="text"
-                    placeholder="Search teams..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex-grow"
-                />
-                <Select value={filterProgress} onValueChange={setFilterProgress}>
-                    <SelectTrigger className="w-40">
-                        <span>{filterProgress === "all" ? "All Progress" : filterProgress}</span>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Progress</SelectItem>
-                        <SelectItem value="Normal">Normal</SelectItem>
-                        <SelectItem value="Heroic">Heroic</SelectItem>
-                        <SelectItem value="Mythic">Mythic</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button onClick={() => setEditingTeam(undefined)}><Plus className="h-4 w-4 mr-2" /> Create Team</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <TeamForm team={editingTeam} onSave={handleSaveTeam} />
-                    </DialogContent>
-                </Dialog>
+        <div className={`p-8 md:p-12 lg:p-16 transition-colors duration-200 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+            <h2 className="text-3xl font-bold mb-8">Group Finder</h2>
+            <div className="flex flex-col md:flex-row mb-6 space-y-4 md:space-y-0 md:space-x-4">
+                <div className="flex-grow">
+                    <Input
+                        type="text"
+                        placeholder="Search teams..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full"
+                    />
+                </div>
+                <div className="flex space-x-4">
+                    <Select value={filterProgress} onValueChange={setFilterProgress}>
+                        <SelectTrigger className="w-40">
+                            <span>{filterProgress === "all" ? "All Progress" : filterProgress}</span>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Progress</SelectItem>
+                            <SelectItem value="Normal">Normal</SelectItem>
+                            <SelectItem value="Heroic">Heroic</SelectItem>
+                            <SelectItem value="Mythic">Mythic</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button onClick={() => setEditingTeam(undefined)}>
+                                <Plus className="h-4 w-4 mr-2" /> Create Team
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <TeamForm team={editingTeam} onSave={handleSaveTeam} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
             <div className="mb-8">
                 <h3 className="text-xl font-semibold mb-4">Your Applications</h3>

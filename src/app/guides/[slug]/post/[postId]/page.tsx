@@ -15,7 +15,6 @@ import { Post, User, Vote } from '@prisma/client'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import CommentsSection from '@/components/CommentsSection'
 
-
 interface SubRedditPostPageProps {
   params: {
     postId: string
@@ -82,7 +81,6 @@ export async function generateMetadata(
     },
   };
 }
-
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   const cachedPost = (await redis.hgetall(

@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
     title: {
-        default: 'Raid Team Finder | World of Warcraft',
-        template: '%s | Raid Team Finder',
+        default: 'Group Finder | World of Warcraft',
+        template: '%s | Group Finder',
     },
-    description: 'Find or create raid teams for World of Warcraft. Join a team that matches your schedule and goals.',
+    description: 'Find or create groups for World of Warcraft. Join a team that matches your schedule and goals.',
     openGraph: {
-        title: 'Raid Team Finder | World of Warcraft',
-        description: 'Find or create raid teams for World of Warcraft. Join a team that matches your schedule and goals.',
+        title: 'Group Finder | World of Warcraft',
+        description: 'Find or create groups for World of Warcraft. Join a team that matches your schedule and goals.',
         type: 'website',
         url: 'https://guidesforgamers.com/world-of-warcraft/raid-teams',
         // Uncomment and update the image URL when you have one
@@ -23,8 +24,8 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Raid Team Finder | World of Warcraft',
-        description: 'Find or create raid teams for World of Warcraft. Join a team that matches your schedule and goals.',
+        title: 'Group Finder | World of Warcraft',
+        description: 'Find or create groups for World of Warcraft. Join a team that matches your schedule and goals.',
         // Uncomment and update the image URL when you have one
         // images: ['https://guidesforgamers.com/images/raid-team-finder-og.jpg'],
     },
@@ -36,8 +37,8 @@ export default function RaidTeamsLayout({
     children: React.ReactNode
 }) {
     return (
-            <div>
-                {children}
-            </div>
+        <div className="min-h-screen transition-colors duration-200 bg-background text-foreground">
+            {children}
+        </div>
     )
 }
