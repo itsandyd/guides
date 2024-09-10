@@ -1,16 +1,16 @@
-
-import { ArrowBigDown, ArrowBigUp, Loader2, Trash2 } from 'lucide-react'
+import '@/styles/editor.css'
+import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { db } from '../../../../../lib/db'
-import { redis } from '../../../../../lib/redis'
-import { getAuthSession } from '../../../../../lib/auth'
-import { formatTimeToNow } from '../../../../../lib/utils'
-import EditorOutput from '../../../../../components/EditorOutput'
-import DeletePostButton from '../../../../../components/DeletePostButton'
-import { buttonVariants } from '../../../../../components/ui/Button'
-import { CachedPost } from '../../../../../types/redis'
+import { db } from '@/lib/db'
+import { redis } from '@/lib/redis'
+import { getAuthSession } from '@/lib/auth'
+import { formatTimeToNow } from '@/lib/utils'
+import EditorOutput from '@/components/EditorOutput'
+import DeletePostButton from '@/components/DeletePostButton'
+import { buttonVariants } from '@/components/ui/Button'
+import { CachedPost } from '@/types/redis'
 import { Post, User, Vote } from '@prisma/client'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import CommentsSection from '@/components/CommentsSection'
@@ -109,8 +109,8 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   const isAuthor = post?.author.id === authSession?.user?.id
 
   return (
-    <div>
-      <div className='h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
+    <div className="container mx-auto pt-8">
+      <div className='flex flex-col sm:flex-row items-center sm:items-start justify-between'>
         <Suspense fallback={<PostVoteShell />}>
           {/* @ts-expect-error server component */}
           <PostVoteServer
@@ -128,19 +128,19 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
           />
         </Suspense>
 
-        <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm'>
-          <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
+        <div className='sm:w-0 w-full flex-1 bg-background text-foreground p-4 rounded-md shadow-md'>
+          <p className='max-h-40 mt-1 truncate text-xs text-muted-foreground'>
             Posted by {post?.author.username ?? cachedPost.authorUsername}{' '}
             {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
           </p>
-          <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900'>
-          {post?.title ?? cachedPost.title}
+          <h1 className='text-2xl font-semibold py-2 leading-6 text-foreground'>
+            {post?.title ?? cachedPost.title}
           </h1>
 
           <EditorOutput content={post?.content ?? cachedPost.content} />
           <Suspense
             fallback={
-              <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
+              <Loader2 className='h-5 w-5 animate-spin text-muted-foreground' />
             }>
             {/* @ts-expect-error Server Component */}
             <CommentsSection postId={post?.id ?? cachedPost.id} />
@@ -160,17 +160,17 @@ function PostVoteShell() {
     <div className='flex items-center flex-col pr-6 w-20'>
       {/* upvote */}
       <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigUp className='h-5 w-5 text-zinc-700' />
+        <ArrowBigUp className='h-5 w-5 text-muted-foreground' />
       </div>
 
       {/* score */}
-      <div className='text-center py-2 font-medium text-sm text-zinc-900'>
+      <div className='text-center py-2 font-medium text-sm text-muted-foreground'>
         <Loader2 className='h-3 w-3 animate-spin' />
       </div>
 
       {/* downvote */}
       <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigDown className='h-5 w-5 text-zinc-700' />
+        <ArrowBigDown className='h-5 w-5 text-muted-foreground' />
       </div>
     </div>
   )

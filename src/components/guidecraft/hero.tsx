@@ -8,7 +8,7 @@ export default function Hero() {
       <p className="text-xl md:text-2xl text-center text-muted-foreground mb-12">
         Discover strategies, tips, and tricks for World of Warcraft, Runescape, League of Legends, Path of Exile, and more!
       </p>
-      <div className="flex flex-col sm:flex-row max-w-md mx-auto space-y-4 sm:space-y-0 sm:space-x-4">
+      <div className="flex flex-col sm:flex-row max-w-md mx-auto space-y-4 sm:space-y-0 sm:space-x-2">
         <Input 
           placeholder="Search games..." 
           className="flex-grow rounded-md sm:rounded-r-none border-r-0 focus:ring-2 focus:ring-primary focus:border-transparent"

@@ -15,13 +15,11 @@ export const metadata: Metadata = {
   keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body>

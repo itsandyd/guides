@@ -8,9 +8,9 @@
 .dark .cdx-button,
 .dark .ce-popover,
 .dark .ce-toolbar__plus:hover {
-  background: theme('colors.popover.DEFAULT');
+  background: theme("colors.popover.DEFAULT");
   color: inherit;
-  border-color: theme('colors.border');
+  border-color: theme("colors.border");
 }
 
 .dark .ce-inline-tool,
@@ -23,18 +23,18 @@
 
 .dark .ce-popover__item-icon,
 .dark .ce-conversion-tool__icon {
-  background-color: theme('colors.muted.DEFAULT');
+  background-color: theme("colors.muted.DEFAULT");
   box-shadow: none;
 }
 
 .dark .cdx-search-field {
-  border-color: theme('colors.border');
-  background: theme('colors.input');
+  border-color: theme("colors.border");
+  background: theme("colors.input");
   color: inherit;
 }
 
 .dark ::selection {
-  background: theme('colors.accent.DEFAULT');
+  background: theme("colors.accent.DEFAULT");
 }
 
 .dark .cdx-settings-button:hover,
@@ -47,12 +47,12 @@
 .dark .ce-popover__item:hover,
 .dark .ce-conversion-tool:hover,
 .dark .ce-toolbar__settings-btn:hover {
-  background-color: theme('colors.accent.DEFAULT');
-  color: theme('colors.accent.foreground');
+  background-color: theme("colors.accent.DEFAULT");
+  color: theme("colors.accent.foreground");
 }
 
 .dark .cdx-notify--error {
-  background: theme('colors.destructive.DEFAULT') !important;
+  background: theme("colors.destructive.DEFAULT") !important;
 }
 
 .dark .cdx-notify__cross::after,
@@ -62,4 +62,113 @@
 
 .codex-editor__redactor {
   padding-bottom: 0 !important;
+}
+
+/* Add these new styles for editor output */
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-foreground;
+}
+
+.prose a {
+  @apply text-primary hover:text-primary/80;
+}
+
+.prose strong {
+  @apply text-foreground font-bold;
+}
+
+.prose ol > li::before {
+  @apply text-foreground;
+}
+
+.prose ul > li::before {
+  @apply bg-foreground;
+}
+
+.prose hr {
+  @apply border-border;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-border bg-muted text-foreground;
+}
+
+.prose code {
+  @apply bg-muted text-foreground px-1 py-0.5 rounded;
+}
+
+.prose pre {
+  @apply bg-muted p-4 rounded-lg;
+}
+
+.prose img {
+  @apply rounded-md;
+}
+
+/* Dark mode specific styles */
+.dark .prose {
+  @apply text-foreground;
+}
+
+.dark .prose a {
+  @apply text-primary hover:text-primary/80;
+}
+
+.dark .prose strong {
+  @apply text-foreground font-bold;
+}
+
+.dark .prose ol > li::before {
+  @apply text-foreground;
+}
+
+.dark .prose ul > li::before {
+  @apply bg-foreground;
+}
+
+.dark .prose hr {
+  @apply border-border;
+}
+
+.dark .prose blockquote {
+  @apply border-l-4 border-border bg-muted text-foreground;
+}
+
+.dark .prose code {
+  @apply bg-muted text-foreground;
+}
+
+.dark .prose pre {
+  @apply bg-muted;
+}
+
+/* Additional styles for better dark mode compatibility */
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6 {
+  @apply text-foreground;
+}
+
+.dark .prose ul > li::before {
+  @apply bg-foreground;
+}
+
+.dark .prose hr {
+  @apply border-border;
+}
+
+.dark .prose img {
+  @apply brightness-90;
 }
