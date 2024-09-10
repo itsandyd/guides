@@ -1,54 +1,49 @@
-import { Suspense } from 'react'
+"use client"
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { db } from '../../lib/db'
 import { Card, CardContent } from '../ui/Card'
 import { Button } from '../ui/Button'
+import dynamic from 'next/dynamic'
 
+const MotionWrapper = dynamic(() => import('../MotionWrapper'), { ssr: false })
 
-async function getPopularSubreddits() {
-  try {
-    return await db.subreddit.findMany({
-      take: 4,
-      orderBy: {
-        updatedAt: 'desc'  // Sort by last update, most recent first
-                // subscribers: {
-        //   _count: 'desc'
-        // }
-      },
-      include: {
-        game: {
-          select: {
-            name: true
-          }
-        }
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching popular subreddits:', error)
-    return []
-  }
-}
-
-function SubredditList({ subreddits }: { subreddits: Awaited<ReturnType<typeof getPopularSubreddits>> }) {
+function SubredditList({ subreddits }: { subreddits: any[] }) {
   if (subreddits.length === 0) {
     return <div className="text-foreground">No popular subreddits found.</div>
   }
 
   return (
-    <section>
+    <MotionWrapper
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <h2 className="text-3xl font-semibold text-center mb-8 text-foreground">Popular Games</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {subreddits.map((subreddit: any) => (
-          <Link href={`/guides/${subreddit.name}`} key={subreddit.id}>
-            <Card className="bg-card border-border hover:bg-accent transition-colors cursor-pointer">
-              <CardContent className="p-4">
-                <h3 className="text-lg font-medium text-center text-card-foreground">{subreddit.name}</h3>
-              </CardContent>
-            </Card>
-          </Link>
+        {subreddits.map((subreddit: any, index: number) => (
+          <MotionWrapper
+            key={subreddit.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <Link href={`/guides/${subreddit.name}`}>
+              <Card className="bg-card border-border hover:bg-accent transition-colors cursor-pointer">
+                <CardContent className="p-4">
+                  <h3 className="text-lg font-medium text-center text-card-foreground">{subreddit.name}</h3>
+                </CardContent>
+              </Card>
+            </Link>
+          </MotionWrapper>
         ))}
       </div>
-      <div className="mt-8 text-center">
+      <MotionWrapper
+        className="mt-8 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
         <Button 
           variant="outline" 
           asChild 
@@ -56,21 +51,22 @@ function SubredditList({ subreddits }: { subreddits: Awaited<ReturnType<typeof g
         >
           <Link href="/categories">View All Games</Link>
         </Button>
-      </div>
-    </section>
+      </MotionWrapper>
+    </MotionWrapper>
   )
-}
-
-async function PopularSubredditsContent() {
-  const subreddits = await getPopularSubreddits()
-  return <SubredditList subreddits={subreddits} />
 }
 
 export default function PopularGames() {
-  return (
-    <Suspense fallback={<div>Loading popular subreddits...</div>}>
-      {/* @ts-expect-error Server Component */}
-      <PopularSubredditsContent />
-    </Suspense>
-  )
+  const [subreddits, setSubreddits] = useState([])
+
+  useEffect(() => {
+    async function fetchSubreddits() {
+      const response = await fetch('/api/popular-subreddits')
+      const data = await response.json()
+      setSubreddits(data)
+    }
+    fetchSubreddits()
+  }, [])
+
+  return <SubredditList subreddits={subreddits} />
 }

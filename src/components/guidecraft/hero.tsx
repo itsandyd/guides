@@ -1,14 +1,39 @@
+"use client"
+
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { motion } from 'framer-motion';
 
 export default function Hero() {
   return (
-    <header className="container mx-auto px-4 py-16 bg-gradient-to-b from-background to-background/80 text-foreground">
-      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">Find Expert Guides for Your Favorite Games</h1>
-      <p className="text-xl md:text-2xl text-center text-muted-foreground mb-12">
+    <motion.header
+      className="container mx-auto px-4 py-16 bg-gradient-to-b from-background to-background/80 text-foreground"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.h1 
+        className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        Find Expert Guides for Your Favorite Games
+      </motion.h1>
+      <motion.p 
+        className="text-xl md:text-2xl text-center text-muted-foreground mb-12"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
         Discover strategies, tips, and tricks for World of Warcraft, Runescape, League of Legends, Path of Exile, and more!
-      </p>
-      <div className="flex flex-col sm:flex-row max-w-md mx-auto space-y-4 sm:space-y-0 sm:space-x-2">
+      </motion.p>
+      <motion.div 
+        className="flex flex-col sm:flex-row max-w-md mx-auto space-y-4 sm:space-y-0 sm:space-x-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
         <Input 
           placeholder="Search games..." 
           className="flex-grow rounded-md sm:rounded-r-none border-r-0 focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -18,7 +43,7 @@ export default function Hero() {
         >
           Search
         </Button>
-      </div>
-    </header>
+      </motion.div>
+    </motion.header>
   )
 }
