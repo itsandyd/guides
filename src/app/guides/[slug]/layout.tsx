@@ -1,5 +1,3 @@
-
-
 import { format } from 'date-fns'
 import type { Metadata } from 'next'
 import Image from 'next/image'
@@ -74,64 +72,64 @@ const Layout = async ({
           <ul className='flex flex-col col-span-2 space-y-6'>{children}</ul>
 
           {/* info sidebar */}
-          <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
+          <div className='overflow-hidden h-fit rounded-lg border border-border bg-background'>
             {/* Ad  */}
             <div className=''>
               <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle>EmoteMaker.ai</CardTitle>
-                  <CardDescription>Create Custom Emotes in Seconds with EmoteMaker.AI</CardDescription>
+                  <CardTitle className="text-foreground">EmoteMaker.ai</CardTitle>
+                  <CardDescription className="text-muted-foreground">Create Custom Emotes in Seconds with EmoteMaker.AI</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Image src="/emotemaker.png" alt="EmoteMaker.ai" width={500} height={500} />
                 </CardContent>
                 <CardFooter>    
                   <Link
-      className={buttonVariants({
-        variant: 'default',
-        className: 'w-full mb-6',
-      })}
-      href="https://emotemaker.ai">
-      Start Generating Today
-    </Link>
-    </CardFooter>
+                    className={buttonVariants({
+                      variant: 'default',
+                      className: 'w-full mb-6',
+                    })}
+                    href="https://emotemaker.ai">
+                    Start Generating Today
+                  </Link>
+                </CardFooter>
               </Card>
             </div>
-              {/* Main Info */}
+            {/* Main Info */}
             <div className='px-6'>
-              <p className='font-semibold py-3'>About {subreddit.name}</p>
+              <p className='font-semibold py-3 text-foreground'>About {subreddit.name}</p>
               {subreddit.creatorId === session?.user?.id ? (
-  <div className='flex justify-between gap-x-4 py-3'>
-    <Link
-      className={buttonVariants({
-        variant: 'outline',
-        className: 'w-full mb-6',
-      })}
-      href={`guides/${slug}/create`}>
-      Edit Category
-    </Link>
-  </div>
-) : null}
+                <div className='flex justify-between gap-x-4 py-3'>
+                  <Link
+                    className={buttonVariants({
+                      variant: 'outline',
+                      className: 'w-full mb-6',
+                    })}
+                    href={`guides/${slug}/create`}>
+                    Edit Category
+                  </Link>
+                </div>
+              ) : null}
             </div>
             
-            <dl className='divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white'>
+            <dl className='divide-y divide-border px-6 py-4 text-sm leading-6 bg-background'>
               <div className='flex justify-between gap-x-4 py-3'>
-                <dt className='text-gray-500'>Created</dt>
-                <dd className='text-gray-700'>
+                <dt className='text-muted-foreground'>Created</dt>
+                <dd className='text-foreground'>
                   <time dateTime={subreddit.createdAt.toDateString()}>
                     {format(subreddit.createdAt, 'MMMM d, yyyy')}
                   </time>
                 </dd>
               </div>
               <div className='flex justify-between gap-x-4 py-3'>
-                <dt className='text-gray-500'>Members</dt>
+                <dt className='text-muted-foreground'>Members</dt>
                 <dd className='flex items-start gap-x-2'>
-                  <div className='text-gray-900'>{memberCount}</div>
+                  <div className='text-foreground'>{memberCount}</div>
                 </dd>
               </div>
               {subreddit.creatorId === session?.user?.id ? (
                 <div className='flex justify-between gap-x-4 py-3'>
-                  <dt className='text-gray-500'>You created this community</dt>
+                  <dt className='text-muted-foreground'>You created this community</dt>
                 </div>
               ) : null}
 

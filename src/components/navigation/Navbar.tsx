@@ -41,7 +41,10 @@ const Navbar = () => {
       <div className="flex items-center gap-x-2">
         <ThemeToggle />
         <Link href="/sign-up">
-          <Button variant="outline" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button 
+            variant="default" 
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+          >
             Get Started
           </Button>
         </Link>
