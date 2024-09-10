@@ -1,45 +1,36 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
-import { toast } from '@/hooks/use-toast'
-import { CommentRequest } from '@/lib/validators/comment'
-
-import { useCustomToasts } from '@/hooks/use-custom-toasts'
+import { useState } from 'react'
+import { Label } from './ui/Label'
+import { Textarea } from './ui/Textarea'
+import { Button } from './ui/Button'
 import { useMutation } from '@tanstack/react-query'
-import axios, { AxiosError } from 'axios'
+import { CommentRequest } from '@/lib/validators/comment'
+import axios from 'axios'
+import { useCustomToasts } from '@/hooks/use-custom-toasts'
+import { toast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
-import { FC, useState } from 'react'
-import { Label } from '@/components/ui/Label'
-import { Textarea } from '@/components/ui/Textarea'
+import LoadingButton from './ui/LoadingButton'
 
 interface CreateCommentProps {
   postId: string
   replyToId?: string
 }
 
-const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
+const CreateComment = ({ postId, replyToId }: CreateCommentProps) => {
   const [input, setInput] = useState<string>('')
-  const router = useRouter()
   const { loginToast } = useCustomToasts()
+  const router = useRouter()
 
   const { mutate: comment, isLoading } = useMutation({
     mutationFn: async ({ postId, text, replyToId }: CommentRequest) => {
       const payload: CommentRequest = { postId, text, replyToId }
 
-      const { data } = await axios.patch(
-        `/api/subreddit/post/comment/`,
-        payload
-      )
+      const { data } = await axios.patch(`/api/subreddit/post/comment/`, payload)
       return data
     },
 
-    onError: (err) => {
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 401) {
-          return loginToast()
-        }
-      }
-
+    onError: () => {
       return toast({
         title: 'Something went wrong.',
         description: "Comment wasn't created successfully. Please try again.",
@@ -54,7 +45,7 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
 
   return (
     <div className='grid w-full gap-1.5'>
-      <Label htmlFor='comment'>Your comment</Label>
+      <Label htmlFor='comment' className='text-foreground'>Your comment</Label>
       <div className='mt-2'>
         <Textarea
           id='comment'
@@ -62,15 +53,17 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
           onChange={(e) => setInput(e.target.value)}
           rows={1}
           placeholder='What are your thoughts?'
+          className='bg-background text-foreground resize-none max-h-40 min-h-[2.5rem]'
         />
 
         <div className='mt-2 flex justify-end'>
-          <Button
-            // isLoading={isLoading}
+          <LoadingButton
+            isLoading={isLoading}
             disabled={input.length === 0}
-            onClick={() => comment({ postId, text: input, replyToId })}>
+            onClick={() => comment({ postId, text: input, replyToId })}
+            className='bg-primary text-primary-foreground hover:bg-primary/90'>
             Post
-          </Button>
+          </LoadingButton>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ import { Label } from '../ui/Label'
 import { Textarea } from '../ui/Textarea'
 import { toast } from '../../hooks/use-toast'
 import { useSession } from 'next-auth/react'
+import LoadingButton from '../ui/LoadingButton'
 
 type ExtendedComment = Comment & {
   votes: CommentVote[]
@@ -79,15 +80,15 @@ const PostComment: FC<PostCommentProps> = ({
           className='h-6 w-6'
         />
         <div className='ml-2 flex items-center gap-x-2'>
-          <p className='text-sm font-medium text-gray-900'>u/{comment.author.username}</p>
+          <p className='text-sm font-medium text-foreground'>u/{comment.author.username}</p>
 
-          <p className='max-h-40 truncate text-xs text-zinc-500'>
+          <p className='max-h-40 truncate text-xs text-muted-foreground'>
             {formatTimeToNow(new Date(comment.createdAt))}
           </p>
         </div>
       </div>
 
-      <p className='text-sm text-zinc-900 mt-2'>{comment.text}</p>
+      <p className='text-sm text-foreground mt-2'>{comment.text}</p>
 
       <div className='flex gap-2 items-center'>
         <CommentVotes
@@ -102,49 +103,49 @@ const PostComment: FC<PostCommentProps> = ({
             setIsReplying(true)
           }}
           variant='ghost'
-          >
+          size='xs'
+          className='text-muted-foreground hover:text-foreground'
+        >
           <MessageSquare className='h-4 w-4 mr-1.5' />
           Reply
         </Button>
       </div>
 
       {isReplying ? (
-        <div className='grid w-full gap-1.5'>
-          <Label htmlFor='comment'>Your comment</Label>
+        <div className='grid w-full gap-1.5 mt-2'>
+          <Label htmlFor='comment' className='text-foreground'>Your comment</Label>
           <div className='mt-2'>
             <Textarea
-              onFocus={(e) =>
-                e.currentTarget.setSelectionRange(
-                  e.currentTarget.value.length,
-                  e.currentTarget.value.length
-                )
-              }
-              autoFocus
               id='comment'
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={1}
               placeholder='What are your thoughts?'
+              className='bg-background text-foreground resize-none'
             />
 
             <div className='mt-2 flex justify-end gap-2'>
               <Button
                 tabIndex={-1}
-                variant='default'
-                onClick={() => setIsReplying(false)}>
+                variant='subtle'
+                onClick={() => setIsReplying(false)}
+              >
                 Cancel
               </Button>
-              <Button
+              <LoadingButton
+                isLoading={isLoading}
                 onClick={() => {
                   if (!input) return
                   postComment({
                     postId,
                     text: input,
-                    replyToId: comment.replyToId ?? comment.id, // default to top-level comment
+                    replyToId: comment.replyToId ?? comment.id,
                   })
-                }}>
+                }}
+                className='bg-primary text-primary-foreground hover:bg-primary/90'
+              >
                 Post
-              </Button>
+              </LoadingButton>
             </div>
           </div>
         </div>
