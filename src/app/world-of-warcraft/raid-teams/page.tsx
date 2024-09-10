@@ -575,7 +575,7 @@ const TeamForm: React.FC<TeamFormProps> = ({ team, onSave }) => {
             </ScrollArea>
             <DialogFooter>
                 <DialogClose asChild>
-                    <Button type="button" variant="secondary">Cancel</Button>
+                    <Button type="button" variant="destructive">Cancel</Button>
                 </DialogClose>
                 <Button type="submit">Save Team</Button>
             </DialogFooter>
