@@ -15,29 +15,23 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
-  const loginWithGoogle = async () => {
+  const loginWithProvider = async (provider: string) => {
     setIsLoading(true)
     try {
-      await signIn('google')
+      const result = await signIn(provider, { callbackUrl: '/', redirect: false })
+      if (result?.error) {
+        toast({
+          title: 'Error',
+          description: `There was an error logging in with ${provider}`,
+          variant: 'destructive',
+        })
+      } else if (result?.url) {
+        window.location.href = result.url
+      }
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'There was an error logging in with Google',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const loginWithTwitch = async () => {
-    setIsLoading(true)
-    try {
-      await signIn('twitch')
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'There was an error logging in with Twitch',
+        description: `There was an error logging in with ${provider}`,
         variant: 'destructive',
       })
     } finally {
@@ -51,7 +45,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         type='button'
         size='lg'
         className='w-full bg-background text-foreground hover:bg-accent hover:text-accent-foreground border border-input'
-        onClick={loginWithGoogle}
+        onClick={() => loginWithProvider('google')}
         disabled={isLoading}>
         {isLoading ? (
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -64,7 +58,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         type='button'
         size='lg'
         className='w-full bg-[#9146FF] hover:bg-[#7C3AED] text-white'
-        onClick={loginWithTwitch}
+        onClick={() => loginWithProvider('twitch')}
         disabled={isLoading}>
         {isLoading ? (
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
