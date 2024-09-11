@@ -8,19 +8,20 @@ import { Card, CardHeader, CardTitle } from '../ui/Card';
 import { cn } from '@/lib/utils';
 
 type Tag = {
-  tagId: string;
+  id: string;
+  name: string;
 };
 
 // Adjust the Post type
 type Post = {
   id: string;
   title: string;
-  content: any; // Adjust according to your actual content type
+  content: any; // or use Prisma.JsonValue if you're using Prisma
   createdAt: Date;
   updatedAt: Date;
   authorId: string;
   subredditId: string;
-  tags: Tag[]; // Use the Tag type here
+  tags: Tag[]; // Update this to match the actual structure
 };
 
 // Adjust the LatestPost type

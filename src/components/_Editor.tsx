@@ -20,9 +20,10 @@ type FormData = z.infer<typeof PostValidator>
 
 interface EditorProps {
   subredditId: string
+  tags: string[] // Add this line
 }
 
-export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
+export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
   const {
     register,
     handleSubmit,
@@ -47,8 +48,9 @@ export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
       title,
       content,
       subredditId,
+      tags,
     }: PostCreationRequest) => {
-      const payload: PostCreationRequest = { title, content, subredditId }
+      const payload: PostCreationRequest = { title, content, subredditId, tags }
       const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
@@ -173,7 +175,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId }) => {
       title: data.title,
       content: blocks,
       subredditId,
-      // tags: [],
+      tags, // Add this line
     }
 
     createPost(payload)

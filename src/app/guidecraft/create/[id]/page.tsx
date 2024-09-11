@@ -64,6 +64,10 @@ export default async function SummaryIndexPage({ params }: Props) {
         select: { id: true, name: true },
     });
 
+    const tags = await db.tag.findMany({
+        select: { id: true, name: true },
+    });
+
     if (!data) {
         return (
             <section className="container mt-40 flex items-center">
@@ -134,6 +138,7 @@ export default async function SummaryIndexPage({ params }: Props) {
                     description={videoInfo.videoDetails.description || ""}
                     thumbnail={videoInfo.videoDetails.thumbnails.reverse()[0].url}
                     subreddits={subreddits} // Pass subreddits to CreatePost
+                    tags={tags}
                 />
                 {/* <VerifyFacts summary={data.summary} /> */}
                 {/* <div className="mb-8">

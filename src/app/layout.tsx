@@ -4,8 +4,6 @@ import { Metadata } from 'next'
 import { ThemeProvider } from '../components/theme-provider'
 import Providers from '../components/Providers'
 import Navbar from '@/components/navigation/Navbar'
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,11 +13,15 @@ export const metadata: Metadata = {
   keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
+interface RootLayoutProps {
+  children: React.ReactNode;
+  authModal: React.ReactNode;
+}
+
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+  authModal,
+}: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
@@ -31,6 +33,7 @@ export default function RootLayout({
         >
           <Providers>
             <Navbar />
+            {authModal}
             <main className="dark:bg-[#1a1a1a] dark:text-white min-h-screen">
               {children}
             </main>

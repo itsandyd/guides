@@ -99,6 +99,7 @@ model Subreddit {
   creatorId   String?
   creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
   subscribers Subscription[]
+  tag         Tag[]
 
   @@index([name])
   @@index([gameId])
@@ -128,9 +129,10 @@ model Post {
   subredditId String
   comments    Comment[]
   votes       Vote[]
-  tags        PostTag[] // Relation to PostTag for many-to-many relationship
+  tags        Tag[]     @relation("PostToTag")
   slug        String?
   thumbnail   String?
+  PostTag     PostTag[]
 
   @@index([authorId])
   @@index([subredditId])
@@ -181,10 +183,18 @@ model CommentVote {
 }
 
 model Tag {
-  id    String    @id @default(cuid())
-  name  String    @unique
-  games Game[]
-  posts PostTag[] // Relation to PostTag for many-to-many relationship
+  id          String    @id @default(cuid())
+  name        String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+  posts       Post[]    @relation("PostToTag")
+  // ... (other fields if any)
+  game        Game?     @relation(fields: [gameId], references: [id])
+  gameId      String?
+  postTag     PostTag[]
+
+  @@index([subredditId])
+  @@index([gameId])
 }
 
 // New model to represent the many-to-many relationship

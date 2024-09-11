@@ -11,7 +11,11 @@ export default async function getLatestPosts() {
           createdAt: 'desc'
         },
         include: {
-          tags: true // Assuming this includes the join table data
+          PostTag: {
+            include: {
+              tag: true
+            }
+          }
         }
       }
     }
@@ -27,10 +31,10 @@ export default async function getLatestPosts() {
       updatedAt: post.updatedAt,
       authorId: post.authorId,
       subredditId: post.subredditId,
-      tags: post.tags.map(tag => ({
-        postId: tag.postId,
-        tagId: tag.tagId
-      })) // Correctly mapping through tags to extract tagId
+      tags: post.PostTag.map(postTag => ({
+        id: postTag.tag.id,
+        name: postTag.tag.name
+      }))
     })),
   }));
 }

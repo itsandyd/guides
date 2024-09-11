@@ -11,10 +11,15 @@ export const PostValidator = z.object({
     }),
   subredditId: z.string(),
   content: z.any(),
+  tags: z.array(z.string()),
   description: z.string().optional(),
-  author: z.string().optional(),
-  thumbnail: z.string().url().optional(),
-  // tags: z.array(z.string()),
+  thumbnail: z.string().optional(),
 })
 
-export type PostCreationRequest = z.infer<typeof PostValidator>
+export type PostCreationRequest = {
+  title: string
+  content: any
+  subredditId: string
+  tags: string[]
+  // ... any other properties ...
+}

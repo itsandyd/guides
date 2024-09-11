@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    const { title, content, description, thumbnail, subredditId } = PostValidator.parse(body)
+    const { title, content, description, thumbnail, subredditId, tags } = PostValidator.parse(body)
 
     const session = await getAuthSession()
 
@@ -15,19 +15,25 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    // verify user is subscribed to passed subreddit id
-    const subscription = await db.subscription.findFirst({
+    // check if user is subscribed to the subreddit
+    let subscription = await db.subscription.findFirst({
       where: {
         subredditId,
         userId: session.user.id,
       },
     })
 
+    // if not subscribed, create a subscription
     if (!subscription) {
-      return new Response('Subscribe to post', { status: 403 })
+      subscription = await db.subscription.create({
+        data: {
+          subredditId,
+          userId: session.user.id,
+        },
+      })
     }
 
-    await db.post.create({
+    const post = await db.post.create({
       data: {
         title,
         content,
@@ -35,6 +41,9 @@ export async function POST(req: Request) {
         thumbnail,
         authorId: session.user.id,
         subredditId,
+        tags: {
+          connect: tags.map((tagId: string) => ({ id: tagId })),
+        },
       },
     })
 

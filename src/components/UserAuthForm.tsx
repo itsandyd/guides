@@ -7,8 +7,7 @@ import { FC } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from './Icons'
-import { Twitch } from 'lucide-react'
-
+import { Loader2, Twitch } from 'lucide-react'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -18,7 +17,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
 
   const loginWithGoogle = async () => {
     setIsLoading(true)
-
     try {
       await signIn('google')
     } catch (error) {
@@ -34,7 +32,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
 
   const loginWithTwitch = async () => {
     setIsLoading(true)
-
     try {
       await signIn('twitch')
     } catch (error) {
@@ -49,26 +46,32 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   }
 
   return (
-    <div className={cn('flex justify-center', className)} {...props}>
+    <div className={cn('flex flex-col space-y-4', className)} {...props}>
       <Button
-        // isLoading={isLoading}
         type='button'
-        size='sm'
-        className='w-full'
+        size='lg'
+        className='w-full bg-background text-foreground hover:bg-accent hover:text-accent-foreground border border-input'
         onClick={loginWithGoogle}
         disabled={isLoading}>
-        {isLoading ? null : <Icons.google className='h-4 w-4 mr-2' />}
-        Google
+        {isLoading ? (
+          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+        ) : (
+          <Icons.google className='mr-2 h-4 w-4' />
+        )}
+        Continue with Google
       </Button>
       <Button
-        // isLoading={isLoading}
         type='button'
-        size='sm'
-        className='w-full'
+        size='lg'
+        className='w-full bg-[#9146FF] hover:bg-[#7C3AED] text-white'
         onClick={loginWithTwitch}
         disabled={isLoading}>
-        {isLoading ? null : <Twitch className='h-4 w-4 mr-2' />}
-        Twitch
+        {isLoading ? (
+          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+        ) : (
+          <Twitch className='mr-2 h-4 w-4' />
+        )}
+        Continue with Twitch
       </Button>
     </div>
   )

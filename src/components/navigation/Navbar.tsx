@@ -1,3 +1,5 @@
+'use client'
+
 import { Montserrat } from "next/font/google";
 import Link from "next/link"
 import { cn } from "@/lib/utils";
@@ -6,10 +8,21 @@ import { Button } from "../ui/Button";
 import { UserAccountNav } from "../UserAccountNav";
 import { Book, Users } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const font = Montserrat({ weight: '600', subsets: ['latin'] });
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <nav className="p-4 bg-background border-b border-border text-foreground flex items-center justify-between z-10">
       <LandingMobileNavbar />
@@ -40,14 +53,18 @@ const Navbar = () => {
       </div>
       <div className="flex items-center gap-x-2">
         <ThemeToggle />
-        <Link href="/sign-up">
-          <Button 
-            variant="default" 
-            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
-          >
-            Get Started
-          </Button>
-        </Link>
+        {status === "authenticated" && session?.user ? (
+          <UserAccountNav user={session.user} />
+        ) : (
+          <Link href="/sign-up">
+            <Button 
+              variant="default" 
+              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+            >
+              Get Started
+            </Button>
+          </Link>
+        )}
       </div>
     </nav>
   )

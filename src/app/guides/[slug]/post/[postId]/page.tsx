@@ -51,7 +51,7 @@ export async function generateMetadata(
     include: {
       votes: true,
       author: true,
-      tags: { // Correctly include tags through the PostTag relation
+      PostTag: { // Change this line
         include: {
           tag: true
         }
@@ -70,7 +70,7 @@ export async function generateMetadata(
     };
   }
 
-  const tagNames = post.tags.map(postTag => postTag.tag.name).join(', ');
+  const tagNames = post.PostTag.map(postTag => postTag.tag.name).join(', '); // Change this line
 
   return {
     title: post.title.length > 60 ? `${post.title.slice(0, 60)}...` : post.title,
