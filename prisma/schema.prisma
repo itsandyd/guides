@@ -60,7 +60,7 @@ model User {
   createdSubreddits Subreddit[]    @relation("CreatedBy")
   subscriptions     Subscription[]
   votes             Vote[]
-  twitchChannel     TwitchChannel? // Add this line
+  twitchChannel     TwitchChannel?
 
   username String? @unique
 
@@ -72,6 +72,11 @@ model User {
   CommentVote      CommentVote[]
   createdRaidTeams RaidTeam[]
   applications     Application[]
+
+  // New fields
+  bio      String?
+  location String?
+  website  String?
 }
 
 model Game {

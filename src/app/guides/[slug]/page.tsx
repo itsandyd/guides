@@ -1,5 +1,3 @@
-
-
 import { notFound } from 'next/navigation'
 import { getAuthSession } from '../../../lib/auth'
 import { db } from '../../../lib/db'
@@ -39,14 +37,14 @@ const page = async ({ params }: PageProps) => {
   if (!subreddit) return notFound()
 
   return (
-    <>
-      <h1 className='font-bold text-3xl md:text-4xl h-14'>
+    <div className='space-y-6'>
+      <h1 className='font-bold text-3xl md:text-4xl'>
         {subreddit.name}
       </h1>
       {/* <MiniCreatePost session={session} /> */}
       <PostFeed initialPosts={subreddit.posts} subredditName={subreddit.name} />
-    </>
-)
+    </div>
+  )
 }
 
 export default page
