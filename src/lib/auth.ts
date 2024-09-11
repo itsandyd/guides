@@ -70,11 +70,8 @@ export const authOptions: NextAuthOptions = {
         username: dbUser.username,
       }
     },
-    redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
+    async redirect({ url, baseUrl }) {
+      // Always redirect to the home page after successful sign-in
       return baseUrl
     },
   },

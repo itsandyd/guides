@@ -18,15 +18,13 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const loginWithProvider = async (provider: string) => {
     setIsLoading(true)
     try {
-      const result = await signIn(provider, { callbackUrl: '/', redirect: false })
+      const result = await signIn(provider, { callbackUrl: '/' })
       if (result?.error) {
         toast({
           title: 'Error',
           description: `There was an error logging in with ${provider}`,
           variant: 'destructive',
         })
-      } else if (result?.url) {
-        window.location.href = result.url
       }
     } catch (error) {
       toast({
