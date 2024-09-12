@@ -109,9 +109,9 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   return (
     <div className="container mx-auto pt-8">
       <div className='flex flex-col sm:flex-row items-center sm:items-start justify-between'>
-        <Suspense fallback={<PostVoteShell />}>
-          {/* @ts-expect-error server component */}
-          <PostVoteServer
+        {/* <Suspense fallback={<PostVoteShell />}> */}
+
+          {/* <PostVoteServer
             postId={post?.id ?? cachedPost.id}
             getData={async () => {
               return await db.post.findUnique({
@@ -123,8 +123,8 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
                 },
               })
             }}
-          />
-        </Suspense>
+          /> */}
+        {/* </Suspense> */}
 
         <div className='sm:w-0 w-full flex-1 bg-background text-foreground p-4 rounded-md shadow-md'>
           <p className='max-h-40 mt-1 truncate text-xs text-muted-foreground'>
@@ -153,25 +153,25 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   )
 }
 
-function PostVoteShell() {
-  return (
-    <div className='flex items-center flex-col pr-6 w-20'>
-      {/* upvote */}
-      <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigUp className='h-5 w-5 text-muted-foreground' />
-      </div>
+// function PostVoteShell() {
+//   return (
+//     <div className='flex items-center flex-col pr-6 w-20'>
+//       {/* upvote */}
+//       <div className={buttonVariants({ variant: 'ghost' })}>
+//         <ArrowBigUp className='h-5 w-5 text-muted-foreground' />
+//       </div>
 
-      {/* score */}
-      <div className='text-center py-2 font-medium text-sm text-muted-foreground'>
-        <Loader2 className='h-3 w-3 animate-spin' />
-      </div>
+//       {/* score */}
+//       <div className='text-center py-2 font-medium text-sm text-muted-foreground'>
+//         <Loader2 className='h-3 w-3 animate-spin' />
+//       </div>
 
-      {/* downvote */}
-      <div className={buttonVariants({ variant: 'ghost' })}>
-        <ArrowBigDown className='h-5 w-5 text-muted-foreground' />
-      </div>
-    </div>
-  )
-}
+//       {/* downvote */}
+//       <div className={buttonVariants({ variant: 'ghost' })}>
+//         <ArrowBigDown className='h-5 w-5 text-muted-foreground' />
+//       </div>
+//     </div>
+//   )
+// }
 
 export default SubRedditPostPage

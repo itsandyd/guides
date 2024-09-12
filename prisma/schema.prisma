@@ -77,6 +77,8 @@ model User {
   bio      String?
   location String?
   website  String?
+
+  characters Character[]
 }
 
 model Game {
@@ -188,13 +190,12 @@ model CommentVote {
 }
 
 model Tag {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
-  subredditId String
-  posts       Post[]    @relation("PostToTag")
-  // ... (other fields if any)
-  game        Game?     @relation(fields: [gameId], references: [id])
+  subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
+  subredditId String?
+  posts       Post[]     @relation("PostToTag")
+  game        Game?      @relation(fields: [gameId], references: [id])
   gameId      String?
   postTag     PostTag[]
 
@@ -297,4 +298,17 @@ model Application {
 
   @@index([applicantId])
   @@index([teamId])
+}
+
+model Character {
+  id        String   @id @default(cuid())
+  name      String
+  class     String
+  spec      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
