@@ -63,7 +63,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
     },
     onSuccess: () => {
       // turn pathname /r/mycommunity/submit into /r/mycommunity
-      const newPathname = pathname.split('/').slice(0, -1).join('/')
+      const newPathname = pathname!.split('/').slice(0, -1).join('/')
       router.push(newPathname)
 
       router.refresh()
