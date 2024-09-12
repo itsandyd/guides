@@ -654,7 +654,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog';
 import axios from 'axios';
 import { useCustomToasts } from '@/hooks/use-custom-toasts';
 import { useSession } from 'next-auth/react';
@@ -662,10 +662,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Application, Character } from '@prisma/client';
-import { Plus } from 'lucide-react';
+import { Plus, PlusCircle } from 'lucide-react';
 import TeamForm from '@/components/team-finder/TeamForm';
 import ApplicationCard from '@/components/team-finder/ApplicationCard';
 import CharacterCard from '@/components/team-finder/CharacterCard';
+import { Label } from '@/components/ui/Label';
 
 
 interface Team {
@@ -703,11 +704,14 @@ const RaidTeamFinder: React.FC = () => {
     const [reviewingApplications, setReviewingApplications] = useState<string | null>(null);
     const [characters, setCharacters] = useState<Character[]>([]);
     const [isAddingCharacter, setIsAddingCharacter] = useState(false);
-    // const [newCharacter, setNewCharacter] = useState<Omit<Character, 'id'>>({
-    //     name: '',
-    //     class: '',
-    //     spec: '',
-    // });
+    const [newCharacter, setNewCharacter] = useState<Omit<Character, 'id'>>({
+        name: '',
+        class: '',
+        spec: '',
+        userId: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    });
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -775,6 +779,24 @@ const RaidTeamFinder: React.FC = () => {
         (filterProgress === "all" || team.progress === filterProgress)
     );
 
+    const handleAddCharacter = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/characters', newCharacter);
+            setCharacters([...characters, response.data]);
+            setIsAddingCharacter(false);
+            setNewCharacter({ name: '', class: '', spec: '', userId: '', createdAt: new Date(), updatedAt: new Date() });
+        } catch (error) {
+            console.error('Error adding character:', error);
+            // You might want to show an error toast here
+        }
+    };
+
+    const handleCharacterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setNewCharacter(prev => ({ ...prev, [name]: value }));
+    };
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-8">Raid Team Finder</h1>
@@ -834,7 +856,7 @@ const RaidTeamFinder: React.FC = () => {
                         <CharacterCard key={character.id} character={character} />
                     ))}
                     <Button onClick={() => setIsAddingCharacter(true)} className="h-full flex items-center justify-center">
-                        <Plus className="mr-2" /> Add Character
+                        <PlusCircle className="mr-2" /> Add Character
                     </Button>
                 </div>
             </div>
@@ -853,6 +875,51 @@ const RaidTeamFinder: React.FC = () => {
                     />
                 ))} */}
             </div>
+            <Dialog open={isAddingCharacter} onOpenChange={setIsAddingCharacter}>
+                <DialogContent>
+                    <form onSubmit={handleAddCharacter} className="space-y-4">
+                        <DialogHeader>
+                            <DialogTitle>Add New Character</DialogTitle>
+                            <DialogDescription>
+                                Enter your character's details below.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div>
+                            <Label htmlFor="name">Character Name</Label>
+                            <Input id="name" name="name" value={newCharacter.name} onChange={handleCharacterChange} required />
+                        </div>
+                        <div>
+                            <Label htmlFor="class">Class</Label>
+                            <Select name="class" value={newCharacter.class} onValueChange={(value) => handleCharacterChange({ target: { name: 'class', value } } as any)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a class" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {/* {Object.keys(classesAndSpecs).map((className) => (
+                                        <SelectItem key={className} value={className}>{className}</SelectItem>
+                                    ))} */}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Label htmlFor="spec">Specialization</Label>
+                            <Select name="spec" value={newCharacter.spec} onValueChange={(value) => handleCharacterChange({ target: { name: 'spec', value } } as any)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a specialization" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {/* {newCharacter.class && Object.keys(classesAndSpecs[newCharacter.class as keyof typeof classesAndSpecs]).map((spec) => (
+                                        <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                                    ))} */}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Add Character</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

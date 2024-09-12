@@ -47,7 +47,7 @@ const DeletePostButton: React.FC<DeletePostButtonProps> = ({ postId }) => {
       onClick={handleDelete}
       disabled={isDeleting}
       variant="destructive"
-      className="mt-4"
+      // className="mt-4"
     >
       <Trash2 className="mr-2 h-4 w-4" />
       {isDeleting ? 'Deleting...' : 'Delete Post'}

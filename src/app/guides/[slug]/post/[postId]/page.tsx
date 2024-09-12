@@ -1,5 +1,5 @@
 import '@/styles/editor.css'
-import { ArrowBigDown, ArrowBigUp, Loader2 } from 'lucide-react'
+import { ArrowBigDown, ArrowBigUp, Loader2, Edit, Clock, User } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -11,9 +11,10 @@ import EditorOutput from '@/components/EditorOutput'
 import DeletePostButton from '@/components/DeletePostButton'
 import { buttonVariants } from '@/components/ui/Button'
 import { CachedPost } from '@/types/redis'
-import { Post, User, Vote } from '@prisma/client'
+import { Post, User as PrismaUser, Vote } from '@prisma/client'
 import PostVoteServer from '@/components/post-vote/PostVoteServer'
 import CommentsSection from '@/components/CommentsSection'
+import Link from 'next/link'
 
 interface SubRedditPostPageProps {
   params: {
@@ -87,7 +88,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
     `post:${params.postId}`
   )) as CachedPost
 
-  let post: (Post & { votes: Vote[]; author: User }) | null = null
+  let post: (Post & { votes: Vote[]; author: PrismaUser; subreddit: { name: string } }) | null = null
 
   if (!cachedPost) {
     post = await db.post.findFirst({
@@ -97,6 +98,11 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
       include: {
         votes: true,
         author: true,
+        subreddit: {
+          select: {
+            name: true
+          }
+        },
       },
     })
   }
@@ -107,71 +113,55 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   const isAuthor = post?.author.id === authSession?.user?.id
 
   return (
-    <div className="container mx-auto pt-8">
-      <div className='flex flex-col sm:flex-row items-center sm:items-start justify-between'>
-        {/* <Suspense fallback={<PostVoteShell />}> */}
-
-          {/* <PostVoteServer
-            postId={post?.id ?? cachedPost.id}
-            getData={async () => {
-              return await db.post.findUnique({
-                where: {
-                  id: params.postId,
-                },
-                include: {
-                  votes: true,
-                },
-              })
-            }}
-          /> */}
-        {/* </Suspense> */}
-
-        <div className='sm:w-0 w-full flex-1 bg-background text-foreground p-4 rounded-md shadow-md'>
-          <p className='max-h-40 mt-1 truncate text-xs text-muted-foreground'>
-            Posted by {post?.author.username ?? cachedPost.authorUsername}{' '}
-            {formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}
-          </p>
-          <h1 className='text-2xl font-semibold py-2 leading-6 text-foreground'>
+    <div className="container mx-auto py-10">
+      <div className='max-w-4xl mx-auto bg-background text-foreground rounded-lg shadow-lg overflow-hidden'>
+        <div className='p-6'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+              <User className='h-4 w-4' />
+              <span>{post?.author.username ?? cachedPost.authorUsername}</span>
+              <span>•</span>
+              <Clock className='h-4 w-4' />
+              <span>{formatTimeToNow(new Date(post?.createdAt ?? cachedPost.createdAt))}</span>
+            </div>
+            {isAuthor && (
+              <div className="flex space-x-2">
+                <Link
+                  href={`/guides/${post?.subreddit.name}/edit/${post?.id ?? cachedPost.id}`}
+                  className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Link>
+                <DeletePostButton postId={post?.id ?? cachedPost.id} />
+              </div>
+            )}
+          </div>
+          
+          <h1 className='text-3xl font-bold mb-6 text-foreground'>
             {post?.title ?? cachedPost.title}
           </h1>
 
-          <EditorOutput content={post?.content ?? cachedPost.content} />
+          <div className='prose prose-stone dark:prose-invert max-w-none'>
+            <EditorOutput content={post?.content ?? cachedPost.content} />
+          </div>
+        </div>
+
+        <div className='bg-muted p-6 mt-6'>
+          <h2 className='text-xl font-semibold mb-4'>Comments</h2>
           <Suspense
             fallback={
-              <Loader2 className='h-5 w-5 animate-spin text-muted-foreground' />
+              <div className='flex justify-center'>
+                <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+              </div>
             }>
             {/* @ts-expect-error Server Component */}
             <CommentsSection postId={post?.id ?? cachedPost.id} />
           </Suspense>
-
-          {isAuthor && (
-            <DeletePostButton postId={post?.id ?? cachedPost.id} />
-          )}
         </div>
       </div>
     </div>
   )
 }
-
-// function PostVoteShell() {
-//   return (
-//     <div className='flex items-center flex-col pr-6 w-20'>
-//       {/* upvote */}
-//       <div className={buttonVariants({ variant: 'ghost' })}>
-//         <ArrowBigUp className='h-5 w-5 text-muted-foreground' />
-//       </div>
-
-//       {/* score */}
-//       <div className='text-center py-2 font-medium text-sm text-muted-foreground'>
-//         <Loader2 className='h-3 w-3 animate-spin' />
-//       </div>
-
-//       {/* downvote */}
-//       <div className={buttonVariants({ variant: 'ghost' })}>
-//         <ArrowBigDown className='h-5 w-5 text-muted-foreground' />
-//       </div>
-//     </div>
-//   )
-// }
 
 export default SubRedditPostPage

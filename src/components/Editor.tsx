@@ -2,7 +2,7 @@
 
 import EditorJS from '@editorjs/editorjs'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import TextareaAutosize from 'react-textarea-autosize'
@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { toast } from '@/hooks/use-toast'
 import { uploadFiles } from '@/lib/uploadthing'
 import { PostCreationRequest, PostValidator } from '@/lib/validators/post'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
 import '@/styles/editor.css'
@@ -26,9 +26,14 @@ type FormData = z.infer<typeof PostValidator>
 interface EditorProps {
   subredditId: string
   tags: { id: string; name: string }[]
+  postId?: string
+  initialData?: any
 }
 
-export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
+export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initialData }) => {
+  const params = useParams()
+  const isEditing = !!postId;
+
   const {
     register,
     handleSubmit,
@@ -55,7 +60,22 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const pathname = usePathname()
 
-  const { mutate: createPost } = useMutation({
+  const { data: existingPost } = useQuery(
+    ['post', postId],
+    () => axios.get(`/api/subreddit/post/${postId}`).then((res) => res.data),
+    {
+      enabled: isEditing,
+      onSuccess: (data) => {
+        if (data) {
+          setValue('title', data.title);
+          setValue('content', data.content);
+          setSelectedTags(data.tags);
+        }
+      },
+    }
+  );
+
+  const { mutate: upsertPost } = useMutation({
     mutationFn: async ({
       title,
       content,
@@ -63,12 +83,15 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       tags,
     }: PostCreationRequest) => {
       const payload: PostCreationRequest = { title, content, subredditId, tags }
-      const { data } = await axios.post('/api/subreddit/post/create', payload)
-      return data
+      if (postId) {
+        return axios.put(`/api/subreddit/post/${postId}`, payload)
+      } else {
+        return axios.post('/api/subreddit/post/create', payload)
+      }
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data || 'An error occurred while creating the post.'
+        const errorMessage = error.response?.data || `An error occurred while ${isEditing ? 'updating' : 'creating'} the post.`
         toast({
           title: 'Error',
           description: errorMessage,
@@ -83,17 +106,14 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       }
     },
     onSuccess: () => {
-      // turn pathname /r/mycommunity/submit into /r/mycommunity
       const newPathname = pathname!.split('/').slice(0, -1).join('/')
       router.push(newPathname)
-
       router.refresh()
-
       return toast({
-        description: 'Your post has been published.',
+        description: `Your post has been ${isEditing ? 'updated' : 'published'}.`,
       })
     },
-  })
+  });
 
   const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null)
   const [editorReady, setEditorReady] = useState(false)
@@ -121,7 +141,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
         },
         placeholder: 'Type here to write your post...',
         inlineToolbar: true,
-        data: { blocks: [] },
+        data: initialData?.content || { blocks: [] },
         tools: {
           header: Header,
           linkTool: {
@@ -154,11 +174,16 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
         },
       })
 
-      setEditorInstance(editor)
+      editor.isReady.then(() => {
+        setEditorInstance(editor)
+      }).catch((error) => {
+        console.error('Editor initialization failed:', error)
+      })
+
     } catch (error) {
       console.error('Failed to initialize the editor:', error)
     }
-  }, [isMounted, editorInstance])
+  }, [isMounted, editorInstance, initialData])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -173,12 +198,28 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
 
     return () => {
       if (editorInstance) {
-        editorInstance.destroy()
-        setEditorInstance(null)
-        setEditorReady(false)
+        if (editorInstance.isReady) {
+          editorInstance.isReady.then(() => {
+            editorInstance.destroy();
+            setEditorInstance(null);
+            setEditorReady(false);
+          });
+        } else {
+          console.warn('Editor was not ready before unmounting');
+        }
       }
     }
   }, [isMounted, initializeEditor, editorInstance])
+
+  useEffect(() => {
+    if (initialData) {
+      setValue('title', initialData.title);
+      if (editorInstance) {
+        editorInstance.render(initialData.content);
+      }
+      setSelectedTags(initialData.tags);
+    }
+  }, [initialData, setValue, editorInstance]);
 
   const handleTagSelect = (tagId: string) => {
     const tag = availableTags.find((t: { id: string }) => t.id === tagId);
@@ -229,7 +270,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       tags: data.tags,
     }
 
-    createPost(payload)
+    upsertPost(payload)
   }
 
   if (!isMounted) {
@@ -311,6 +352,10 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
               to open the command menu.
             </p>
           </div>
+
+          <Button type="submit" className="mt-4">
+            {isEditing ? 'Update Post' : 'Create Post'}
+          </Button>
         </form>
       )}
     </div>
