@@ -1,6 +1,6 @@
 'use client'
 
-// import { formatTimeToNow } from '@/lib/utils'
+import { formatTimeToNow } from '@/lib/utils'
 import type { Post as PostType, User, Vote } from '@prisma/client'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
@@ -33,32 +33,32 @@ const Post: FC<PostProps> = ({
   return (
     <div className='rounded-md bg-card shadow'>
       <div className='px-6 py-4 flex justify-between'>
-        {/* <PostVoteClient
+        <PostVoteClient
           postId={post.id}
           initialVotesAmt={_votesAmt}
           initialVote={_currentVote?.type}
-        /> */}
+        />
 
         <div className='w-0 flex-1'>
           <div className='max-h-40 mt-1 text-xs text-muted-foreground'>
             {subredditName ? (
               <>
-                <a
+                <Link
                   className='underline text-foreground text-sm underline-offset-2'
                   href={`/guides/${subredditName}`}>
                   guides/{subredditName}
-                </a>
+                </Link>
                 <span className='px-1'>•</span>
               </>
             ) : null}
             <span>Posted by {post.author.username}</span>{' '}
-            {/* {formatTimeToNow(new Date(post.createdAt))} */}
+            {formatTimeToNow(new Date(post.createdAt))}
           </div>
-          <a href={`/guides/${subredditName}/post/${post.id}`}>
+          <Link href={`/guides/${subredditName}/post/${post.slug}`}>
             <h1 className='text-lg font-semibold py-2 leading-6 text-foreground'>
               {post.title}
             </h1>
-          </a>
+          </Link>
 
           <div
             className='relative text-sm max-h-40 w-full overflow-clip'
@@ -74,7 +74,7 @@ const Post: FC<PostProps> = ({
 
       <div className='bg-accent z-20 text-sm px-4 py-4 sm:px-6'>
         <Link
-          href={`/guides/${subredditName}/post/${post.id}`}
+          href={`/guides/${subredditName}/post/${post.slug}`}
           className='w-fit flex items-center gap-2 text-muted-foreground hover:text-foreground'>
           <MessageSquare className='h-4 w-4' /> {commentAmt} comments
         </Link>

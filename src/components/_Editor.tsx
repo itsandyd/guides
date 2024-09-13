@@ -13,6 +13,7 @@ import { uploadFiles } from '@/lib/uploadthing'
 import { PostCreationRequest, PostValidator } from '@/lib/validators/post'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
+import { generateSlug } from '@/lib/utils'
 
 import '@/styles/editor.css'
 
@@ -34,9 +35,11 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       subredditId,
       title: '',
       content: null,
-      // tags: [],
+      selectedTags: [], // Change this from 'tags' to 'selectedTags'
+      slug: '', // Add this line
     },
   })
+
   const ref = useRef<EditorJS>()
   const _titleRef = useRef<HTMLTextAreaElement>(null)
   const router = useRouter()
@@ -48,9 +51,10 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       title,
       content,
       subredditId,
-      tags,
+      selectedTags,
     }: PostCreationRequest) => {
-      const payload: PostCreationRequest = { title, content, subredditId, tags }
+      const slug = generateSlug(title) // Generate slug from title
+      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug }
       const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
@@ -175,7 +179,8 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       title: data.title,
       content: blocks,
       subredditId,
-      tags, // Add this line
+      selectedTags: data.selectedTags,
+      slug: generateSlug(data.title), // Generate slug here
     }
 
     createPost(payload)

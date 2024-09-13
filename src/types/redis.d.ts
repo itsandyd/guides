@@ -7,4 +7,6 @@ export type CachedPost = {
   content: string
   currentVote: Vote['type'] | null
   createdAt: Date
+  slug: string  // Add this line
+  subredditName: string  // Add this line as well
 }

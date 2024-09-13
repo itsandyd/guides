@@ -17,10 +17,11 @@ import CommentsSection from '@/components/CommentsSection'
 import Link from 'next/link'
 
 interface SubRedditPostPageProps {
-  params: {
-    postId: string
+    params: {
+      guideSlug: string
+      postSlug: string
+    }
   }
-}
 
 interface Block {
   id: string;
@@ -45,20 +46,25 @@ export async function generateMetadata(
   { params }: SubRedditPostPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const post = await db.post.findFirst({
-    where: {
-      id: params.postId,
-    },
-    include: {
-      votes: true,
-      author: true,
-      PostTag: { // Change this line
+    const post = await db.post.findUnique({
+        where: {
+          slug: params.postSlug,
+        },
         include: {
-          tag: true
-        }
-      }
-    },
-  });
+          votes: true,
+          author: true,
+          postTags: {
+            include: {
+              tag: true
+            }
+          },
+          subreddit: {
+            select: {
+              name: true
+            }
+          },
+        },
+      })
 
   if (!post) {
     return {
@@ -71,7 +77,7 @@ export async function generateMetadata(
     };
   }
 
-  const tagNames = post.PostTag.map(postTag => postTag.tag.name).join(', '); // Change this line
+  const tagNames = post.postTags.map(postTag => postTag.tag.name).join(', '); // Change this line
 
   return {
     title: post.title.length > 60 ? `${post.title.slice(0, 60)}...` : post.title,
@@ -84,16 +90,16 @@ export async function generateMetadata(
 }
 
 const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
-  const cachedPost = (await redis.hgetall(
-    `post:${params.postId}`
-  )) as CachedPost
+    const cachedPost = (await redis.hgetall(
+        `post:${params.postSlug}`
+      )) as CachedPost
 
   let post: (Post & { votes: Vote[]; author: PrismaUser; subreddit: { name: string } }) | null = null
 
   if (!cachedPost) {
-    post = await db.post.findFirst({
+    post = await db.post.findUnique({
       where: {
-        id: params.postId,
+        slug: params.postSlug,
       },
       include: {
         votes: true,
@@ -110,7 +116,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
   if (!post && !cachedPost) return notFound()
 
   const authSession = await getAuthSession()
-  const isAuthor = post?.author.id === authSession?.user?.id
+  const isAuthor = post?.author.id === authSession?.user?.id || cachedPost?.authorUsername === authSession?.user?.name
 
   return (
     <div className="container mx-auto py-10">
@@ -127,7 +133,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             {isAuthor && (
               <div className="flex space-x-2">
                 <Link
-                  href={`/guides/${post?.subreddit.name}/edit/${post?.id ?? cachedPost.id}`}
+                  href={`/guides/${post?.subreddit.name ?? cachedPost.subredditName}/edit/${post?.slug ?? cachedPost.slug}`}
                   className={buttonVariants({ variant: 'outline', size: 'sm' })}
                 >
                   <Edit className="h-4 w-4 mr-2" />

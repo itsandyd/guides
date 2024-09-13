@@ -106,7 +106,8 @@ model Subreddit {
   creatorId   String?
   creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
   subscribers Subscription[]
-  tag         Tag[]
+
+  tags Tag[]
 
   @@index([name])
   @@index([gameId])
@@ -127,7 +128,6 @@ model Post {
   id          String    @id @default(cuid())
   title       String
   content     Json?
-  description String?   @db.LongText
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   author      User      @relation(fields: [authorId], references: [id])
@@ -136,10 +136,11 @@ model Post {
   subredditId String
   comments    Comment[]
   votes       Vote[]
-  tags        Tag[]     @relation("PostToTag")
-  slug        String?
-  thumbnail   String?
-  PostTag     PostTag[]
+  postTags    PostTag[]
+  slug        String?   @unique
+  tags        Tag[]     @relation("PostToTag") // Change this line
+  description String?
+  // Remove the Tag and tagId fields
 
   @@index([authorId])
   @@index([subredditId])

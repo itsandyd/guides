@@ -17,17 +17,16 @@ export const metadata: Metadata = {
   keywords: ['Guides', 'Gamers', 'Gaming', 'Guide', 'Gamer'],
 }
 
-const Layout = async ({
-  children,
-  params: { slug },
-}: {
+interface LayoutProps {
   children: ReactNode
-  params: { slug: string }
-}) => {
+  params: { guideSlug: string }
+}
+
+const Layout = async ({ children, params: { guideSlug } }: LayoutProps) => {
   const session = await getAuthSession()
 
   const subreddit = await db.subreddit.findFirst({
-    where: { name: slug },
+    where: { name: guideSlug },
     include: {
       posts: {
         include: {
@@ -43,7 +42,7 @@ const Layout = async ({
     : await db.subscription.findFirst({
         where: {
           subreddit: {
-            name: slug,
+            name: guideSlug,
           },
           user: {
             id: session.user.id,
@@ -58,7 +57,7 @@ const Layout = async ({
   const memberCount = await db.subscription.count({
     where: {
       subreddit: {
-        name: slug,
+        name: guideSlug,
       },
     },
   })
@@ -105,7 +104,7 @@ const Layout = async ({
                       variant: 'outline',
                       className: 'w-full mb-6',
                     })}
-                    href={`guides/${slug}/create`}>
+                    href={`/guides/${guideSlug}/create`}>
                     Edit Category
                   </Link>
                 </div>
@@ -145,7 +144,7 @@ const Layout = async ({
                   variant: 'outline',
                   className: 'w-full mb-6',
                 })}
-                href={`guides/${slug}/submit`}>
+                href={`/guides/${guideSlug}/submit`}>
                 Create Post
               </Link>
             </dl>

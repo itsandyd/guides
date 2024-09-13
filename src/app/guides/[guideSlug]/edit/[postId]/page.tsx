@@ -62,6 +62,7 @@ const EditPostPage = async ({ params }: EditPageProps) => {
       <Editor 
         subredditId={subreddit.id} 
         tags={formattedTags} 
+        guideSlug={params.slug}
         postId={params.postId}
         initialData={post}
       />

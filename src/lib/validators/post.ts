@@ -11,15 +11,8 @@ export const PostValidator = z.object({
     }),
   subredditId: z.string(),
   content: z.any(),
-  tags: z.array(z.string()),
-  description: z.string().optional(),
-  thumbnail: z.string().optional(),
+  selectedTags: z.array(z.string()).optional(),
+  slug: z.string(),  // Add this line
 })
 
-export type PostCreationRequest = {
-  title: string
-  content: any
-  subredditId: string
-  tags: string[]
-  // ... any other properties ...
-}
+export type PostCreationRequest = z.infer<typeof PostValidator>

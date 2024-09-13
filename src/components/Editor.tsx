@@ -13,6 +13,7 @@ import { uploadFiles } from '@/lib/uploadthing'
 import { PostCreationRequest, PostValidator } from '@/lib/validators/post'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
+import { generateSlug } from '@/lib/utils'
 
 import '@/styles/editor.css'
 
@@ -28,9 +29,10 @@ interface EditorProps {
   tags: { id: string; name: string }[]
   postId?: string
   initialData?: any
+  guideSlug: string
 }
 
-export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initialData }) => {
+export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initialData, guideSlug }) => {
   const params = useParams()
   const isEditing = !!postId;
 
@@ -45,7 +47,8 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       subredditId,
       title: '',
       content: null,
-      tags: [],
+      selectedTags: [],
+      slug: '',
     },
   });
 
@@ -80,9 +83,10 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       title,
       content,
       subredditId,
-      tags,
+      selectedTags,
     }: PostCreationRequest) => {
-      const payload: PostCreationRequest = { title, content, subredditId, tags }
+      const slug = generateSlug(title)
+      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug }
       if (postId) {
         return axios.put(`/api/subreddit/post/${postId}`, payload)
       } else {
@@ -106,8 +110,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       }
     },
     onSuccess: () => {
-      const newPathname = pathname!.split('/').slice(0, -1).join('/')
-      router.push(newPathname)
+      router.push(`/guides/${guideSlug}`)
       router.refresh()
       return toast({
         description: `Your post has been ${isEditing ? 'updated' : 'published'}.`,
@@ -225,13 +228,13 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
     const tag = availableTags.find((t: { id: string }) => t.id === tagId);
     if (tag && !selectedTags.some((t: { id: string }) => t.id === tagId)) {
       setSelectedTags(prevSelectedTags => [...prevSelectedTags, tag]);
-      setValue('tags', [...selectedTags, tag].map((t: { id: string }) => t.id));
+      setValue('selectedTags', [...selectedTags, tag].map((t: { id: string }) => t.id));
     }
   };
 
   const handleTagRemove = (tagId: string) => {
     setSelectedTags(selectedTags.filter(tag => tag.id !== tagId));
-    setValue('tags', selectedTags.filter(tag => tag.id !== tagId).map(t => t.id));
+    setValue('selectedTags', selectedTags.filter(tag => tag.id !== tagId).map(t => t.id));
   };
 
   const handleCreateNewTag = async () => {
@@ -242,7 +245,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
         const newTag = response.data
         setAvailableTags(prevTags => [...prevTags, newTag])
         setSelectedTags(prevSelectedTags => [...prevSelectedTags, newTag])
-        setValue('tags', [...selectedTags, newTag].map(t => t.id))
+        setValue('selectedTags', [...selectedTags, newTag].map(t => t.id))
         setNewTagName('')
         toast({
           title: 'Tag created',
@@ -267,7 +270,8 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       title: data.title,
       content: blocks,
       subredditId,
-      tags: data.tags,
+      selectedTags: data.selectedTags,
+      slug: generateSlug(data.title),
     }
 
     upsertPost(payload)
