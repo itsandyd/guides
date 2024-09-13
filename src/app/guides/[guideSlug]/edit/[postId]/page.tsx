@@ -16,7 +16,7 @@ const EditPostPage = async ({ params }: EditPageProps) => {
       name: params.slug,
     },
     include: {
-      tag: true,
+      tags: true,
     },
   })
 
