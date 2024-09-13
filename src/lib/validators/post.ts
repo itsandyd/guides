@@ -12,7 +12,7 @@ export const PostValidator = z.object({
   subredditId: z.string(),
   content: z.any(),
   selectedTags: z.array(z.string()).optional(),
-  // Remove the slug field from here
+  slug: z.string(), // Add this line
 })
 
 export type PostCreationRequest = z.infer<typeof PostValidator>

@@ -41,14 +41,14 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<PostCreationRequest>({
     resolver: zodResolver(PostValidator),
     defaultValues: {
       subredditId,
       title: '',
       content: null,
       selectedTags: [],
-      slug: '',
+      slug: '', // This is now valid
     },
   });
 
@@ -86,7 +86,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       selectedTags,
     }: PostCreationRequest) => {
       const slug = generateSlug(title)
-      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug }
+      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug } // This is now valid
       if (postId) {
         return axios.put(`/api/subreddit/post/${postId}`, payload)
       } else {
@@ -263,7 +263,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
     }
   };
 
-  async function onSubmit(data: FormData) {
+  async function onSubmit(data: PostCreationRequest) {
     const blocks = await ref.current?.save()
 
     const payload: PostCreationRequest = {
@@ -271,7 +271,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
       content: blocks,
       subredditId,
       selectedTags: data.selectedTags,
-      slug: generateSlug(data.title),
+      slug: generateSlug(data.title), // This is now valid
     }
 
     upsertPost(payload)

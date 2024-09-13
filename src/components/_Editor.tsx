@@ -29,14 +29,14 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<PostCreationRequest>({
     resolver: zodResolver(PostValidator),
     defaultValues: {
       subredditId,
       title: '',
       content: null,
-      selectedTags: [], // Change this from 'tags' to 'selectedTags'
-      slug: '', // Add this line
+      selectedTags: [],
+      slug: '', // This is now valid
     },
   })
 
@@ -53,8 +53,8 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       subredditId,
       selectedTags,
     }: PostCreationRequest) => {
-      const slug = generateSlug(title) // Generate slug from title
-      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug }
+      const slug = generateSlug(title)
+      const payload: PostCreationRequest = { title, content, subredditId, selectedTags, slug } // This is now valid
       const { data } = await axios.post('/api/subreddit/post/create', payload)
       return data
     },
@@ -172,7 +172,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
     }
   }, [isMounted, initializeEditor])
 
-  async function onSubmit(data: FormData) {
+  async function onSubmit(data: PostCreationRequest) {
     const blocks = await ref.current?.save()
 
     const payload: PostCreationRequest = {
@@ -180,7 +180,7 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags }) => {
       content: blocks,
       subredditId,
       selectedTags: data.selectedTags,
-      slug: generateSlug(data.title), // Generate slug here
+      slug: generateSlug(data.title), // This is now valid
     }
 
     createPost(payload)
