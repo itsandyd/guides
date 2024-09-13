@@ -11,11 +11,15 @@ export default async function getLatestPosts() {
           createdAt: 'desc'
         },
         include: {
-          PostTag: {
+          postTags: {
             include: {
               tag: true
             }
-          }
+          },
+          author: true,
+          votes: true,
+          comments: true,
+          subreddit: true,
         }
       }
     }
@@ -31,7 +35,7 @@ export default async function getLatestPosts() {
       updatedAt: post.updatedAt,
       authorId: post.authorId,
       subredditId: post.subredditId,
-      tags: post.PostTag.map(postTag => ({
+      tags: post.postTags.map(postTag => ({
         id: postTag.tag.id,
         name: postTag.tag.name
       }))

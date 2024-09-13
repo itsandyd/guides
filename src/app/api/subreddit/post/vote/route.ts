@@ -34,6 +34,7 @@ export async function PATCH(req: Request) {
       include: {
         author: true,
         votes: true,
+        subreddit: true, // Add this line
       },
     })
 
@@ -66,8 +67,10 @@ export async function PATCH(req: Request) {
             content: JSON.stringify(post.content),
             id: post.id,
             title: post.title,
-            currentVote: null,
+            currentVote: null, // or voteType, depending on the context
             createdAt: post.createdAt,
+            slug: post.slug ?? '',  // Add this line
+            subredditName: post.subreddit.name,  // Add this line
           }
 
           await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
@@ -104,6 +107,8 @@ export async function PATCH(req: Request) {
           title: post.title,
           currentVote: voteType,
           createdAt: post.createdAt,
+          slug: post.slug ?? '',  // Add this line
+          subredditName: post.subreddit.name,  // Add this line
         }
 
         await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
@@ -136,6 +141,8 @@ export async function PATCH(req: Request) {
         title: post.title,
         currentVote: voteType,
         createdAt: post.createdAt,
+        slug: post.slug ?? '',  // Add this line
+        subredditName: post.subreddit.name,  // Add this line
       }
 
       await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
