@@ -2,6 +2,7 @@ import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { PostValidator } from '@/lib/validators/post'
 import { z } from 'zod'
+import { generateSlug } from '@/lib/utils'
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { title, content, subredditId, selectedTags, slug } = PostValidator.parse(body)
+    const { title, content, subredditId, selectedTags } = PostValidator.parse(body)
 
     const subscriptionExists = await db.subscription.findFirst({
       where: {
@@ -23,6 +24,25 @@ export async function POST(req: Request) {
 
     if (!subscriptionExists) {
       return new Response("Subscribe to post", { status: 403 })
+    }
+
+    // Generate a base slug
+    let slug = generateSlug(title)
+    let slugExists = true
+    let slugCounter = 1
+
+    // Keep checking and modifying the slug until we find a unique one
+    while (slugExists) {
+      const existingPost = await db.post.findUnique({
+        where: { slug },
+      })
+
+      if (!existingPost) {
+        slugExists = false
+      } else {
+        slug = `${generateSlug(title)}-${slugCounter}`
+        slugCounter++
+      }
     }
 
     const post = await db.post.create({
