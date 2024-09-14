@@ -4,6 +4,7 @@ import { Metadata } from 'next'
 import { ThemeProvider } from '../components/theme-provider'
 import Providers from '../components/Providers'
 import Navbar from '@/components/navigation/Navbar'
+import { ClerkProvider } from "@clerk/nextjs"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,13 +32,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Providers>
-            <Navbar />
-            {authModal}
-            <main className="dark:bg-[#1a1a1a] dark:text-white min-h-screen">
-              {children}
-            </main>
-          </Providers>
+            <Providers>
+              <Navbar />
+              {authModal}
+              <main className="dark:bg-[#1a1a1a] dark:text-white min-h-screen">
+                {children}
+              </main>
+            </Providers>
         </ThemeProvider>
       </body>
     </html>

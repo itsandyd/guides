@@ -4,11 +4,26 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Card, CardContent } from '../ui/Card'
 import { Button } from '../ui/Button'
+import { Skeleton } from '../ui/skeleton'
 import dynamic from 'next/dynamic'
 
 const MotionWrapper = dynamic(() => import('../MotionWrapper'), { ssr: false })
 
-function SubredditList({ subreddits }: { subreddits: any[] }) {
+function SubredditList({ subreddits, isLoading }: { subreddits: any[], isLoading: boolean }) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(8)].map((_, index) => (
+          <Card key={index} className="bg-card border-border">
+            <CardContent className="p-4">
+              <Skeleton className="h-6 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
   if (subreddits.length === 0) {
     return <div className="text-foreground">No popular subreddits found.</div>
   }
@@ -58,15 +73,23 @@ function SubredditList({ subreddits }: { subreddits: any[] }) {
 
 export default function PopularGames() {
   const [subreddits, setSubreddits] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function fetchSubreddits() {
-      const response = await fetch('/api/popular-subreddits')
-      const data = await response.json()
-      setSubreddits(data)
+      setIsLoading(true)
+      try {
+        const response = await fetch('/api/popular-subreddits')
+        const data = await response.json()
+        setSubreddits(data)
+      } catch (error) {
+        console.error('Failed to fetch subreddits:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
     fetchSubreddits()
   }, [])
 
-  return <SubredditList subreddits={subreddits} />
+  return <SubredditList subreddits={subreddits} isLoading={isLoading} />
 }

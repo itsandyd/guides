@@ -8,12 +8,13 @@ const nextConfig = {
       "i.ytimg.com",
       "pprcanvas.s3.amazonaws.com",
       "res.cloudinary.com",
+      "img.clerk.com",
     ],
   },
-  experimental: {
-    appDir: true,
-    serverActions: true,
-  },
+  // experimental: {
+  //   appDir: true,
+  //   serverActions: true,
+  // },
 };
 
 module.exports = nextConfig;

@@ -12,6 +12,7 @@
     "enhance": "ts-node src/scripts/enhance.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.5.2",
     "@editorjs/code": "^2.8.0",
     "@editorjs/editorjs": "^2.27.0",
     "@editorjs/embed": "^2.5.3",
@@ -70,7 +71,7 @@
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.379.0",
     "nanoid": "^4.0.2",
-    "next": "13.4.4",
+    "next": "^14.2.11",
     "next-auth": "^4.22.1",
     "next-themes": "^0.3.0",
     "novel": "^0.1.22",

@@ -1,9 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { User } from 'next-auth'
-import { signOut } from 'next-auth/react'
-
+import { UserResource } from '@clerk/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,28 +10,30 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu'
 import { UserAvatar } from '@/components/UserAvatar'
-import { MessageCircle } from 'lucide-react'
+import { useClerk } from '@clerk/nextjs'
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
-  user: Pick<User, 'name' | 'image' | 'email'>
+  user: UserResource
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
+  const { signOut } = useClerk();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <UserAvatar
-          user={{ name: user.name || null, image: user.image || null }}
+          user={{ name: user.fullName || null, image: user.imageUrl || null }}
           className='h-8 w-8'
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent className='bg-white' align='end'>
         <div className='flex items-center justify-start gap-2 p-2'>
           <div className='flex flex-col space-y-1 leading-none'>
-            {/* {user.name && <p className='font-medium'>{user.}</p>} */}
-            {user.email && (
+            {user.fullName && <p className='font-medium'>{user.fullName}</p>}
+            {user.primaryEmailAddress && (
               <p className='w-[200px] truncate text-sm text-muted-foreground'>
-                {user.email}
+                {user.primaryEmailAddress.emailAddress}
               </p>
             )}
           </div>
@@ -42,25 +42,15 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         <DropdownMenuItem asChild>
           <Link href='/feed'>Feed</Link>
         </DropdownMenuItem>
-
-        {/* <DropdownMenuItem asChild>
-          <Link href='/categories/create'>Create Category</Link>
-        </DropdownMenuItem> */}
-
         <DropdownMenuItem asChild>
           <Link href='/settings'>Settings</Link>
         </DropdownMenuItem>
-        {/* <DropdownMenuItem asChild>
-          <Link href='https://discord.gg/sVPGxbnM'>Join our Discord</Link>
-        </DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className='cursor-pointer'
           onSelect={(event) => {
             event.preventDefault()
-            signOut({
-              callbackUrl: `${window.location.origin}/sign-in`,
-            })
+            // signOut(() => window.location.href = `${window.location.origin}/sign-in`)
           }}>
           Sign out
         </DropdownMenuItem>

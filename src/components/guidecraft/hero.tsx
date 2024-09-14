@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 export default function Hero() {
   return (
     <motion.header
-      className="container mx-auto px-4 py-16 bg-gradient-to-b from-background to-background/80 text-foreground"
+      className="container mx-auto px-4 pt-16 bg-gradient-to-b from-background to-background/80 text-foreground"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -28,7 +28,7 @@ export default function Hero() {
       >
         Discover strategies, tips, and tricks for World of Warcraft, Runescape, League of Legends, Path of Exile, and more!
       </motion.p>
-      <motion.div 
+      {/* <motion.div 
         className="flex flex-col sm:flex-row max-w-md mx-auto space-y-4 sm:space-y-0 sm:space-x-2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ export default function Hero() {
         >
           Search
         </Button>
-      </motion.div>
+      </motion.div> */}
     </motion.header>
   )
 }

@@ -6,15 +6,21 @@ import { cn } from "@/lib/utils";
 import { LandingMobileNavbar } from "./mobile-navbar";
 import { Button } from "../ui/Button";
 import { UserAccountNav } from "../UserAccountNav";
-import { Book, Users } from "lucide-react";
+import { Book, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useUser, SignInButton } from "@clerk/nextjs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropdownMenu";
 
 const font = Montserrat({ weight: '600', subsets: ['latin'] });
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
+  const { isSignedIn, user } = useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -39,31 +45,36 @@ const Navbar = () => {
               Guide Categories
             </Button>
           </Link>
-          <Link href="https://emotemaker.ai">
-            <Button variant="ghost" className="rounded-full text-foreground hover:text-primary hover:bg-accent">
-              AI Emote Generation
-            </Button>
-          </Link>
-          <Link href="/world-of-warcraft/raid-teams">
-            <Button variant="ghost" className="rounded-full text-foreground hover:text-primary hover:bg-accent">
-              Team Finder
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="rounded-full text-foreground hover:text-primary hover:bg-accent">
+                Tools <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="https://emotemaker.ai">AI Emote Generation</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/world-of-warcraft/raid-teams">Team Finder</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="flex items-center gap-x-2">
         <ThemeToggle />
-        {status === "authenticated" && session?.user ? (
-          <UserAccountNav user={session.user} />
+        {isSignedIn && user ? (
+          <UserAccountNav user={user} />
         ) : (
-          <Link href="/sign-up">
+          <SignInButton mode="modal">
             <Button 
               variant="default" 
               className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
             >
               Get Started
             </Button>
-          </Link>
+          </SignInButton>
         )}
       </div>
     </nav>

@@ -8,7 +8,7 @@ import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 import { FC, useEffect, useRef } from 'react'
 import Post from './Post'
-import { useSession } from 'next-auth/react'
+import { useUser } from "@clerk/nextjs"
 
 interface PostFeedProps {
   initialPosts: ExtendedPost[]
@@ -21,7 +21,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
     root: lastPostRef.current,
     threshold: 1,
   })
-  const { data: session } = useSession()
+  const { user, isSignedIn } = useUser()
 
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ['infinite-query'],
@@ -59,9 +59,9 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
           return acc
         }, 0)
 
-        const currentVote = post.votes.find(
-          (vote) => vote.userId === session?.user.id
-        )
+        const currentVote = isSignedIn ? post.votes.find(
+          (vote) => vote.userId === user?.id
+        ) : undefined
 
         if (index === posts.length - 1) {
           return (
