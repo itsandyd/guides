@@ -132,13 +132,13 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             </div>
             {isAuthor && (
               <div className="flex space-x-2">
-                <Link
-                  href={`/guides/${post?.subreddit.name ?? cachedPost.subredditName}/edit/${post?.slug ?? cachedPost.slug}`}
-                  className={buttonVariants({ variant: 'outline', size: 'sm' })}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Link>
+            <Link
+            href={`/guides/${post?.subreddit.name ?? cachedPost.subredditName}/edit/${post?.id ?? cachedPost.id}`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+            </Link>
                 <DeletePostButton postId={post?.id ?? cachedPost.id} />
               </div>
             )}
