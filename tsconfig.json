@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/twitch/SearchTwitchUser.jsx", "src/components/twitch/SearchTwitchUser.jsx", "src/components/twitch/TwitchStreamer.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/twitch/SearchTwitchUser.jsx", "src/components/twitch/SearchTwitchUser.jsx", "src/components/twitch/TwitchStreamer.jsx", "src/lib/blizzardClient.ts", "src/scripts/fetchBlizzardItems.js"],
   "exclude": ["node_modules"]
 }

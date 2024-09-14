@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,17 +6,6 @@ datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
-}
-
-enum VoteType {
-  UP
-  DOWN
-}
-
-enum ApplicationStatus {
-  PENDING
-  APPROVED
-  DECLINED
 }
 
 model Account {
@@ -35,8 +21,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -57,28 +42,23 @@ model User {
   name              String?
   email             String?        @unique
   emailVerified     DateTime?
+  username          String?        @unique
+  image             String?
+  bio               String?
+  location          String?
+  website           String?
   createdSubreddits Subreddit[]    @relation("CreatedBy")
   subscriptions     Subscription[]
   votes             Vote[]
   twitchChannel     TwitchChannel?
-
-  username String? @unique
-
-  image            String?
-  accounts         Account[]
-  sessions         Session[]
-  Post             Post[]
-  Comment          Comment[]
-  CommentVote      CommentVote[]
-  createdRaidTeams RaidTeam[]
-  applications     Application[]
-
-  // New fields
-  bio      String?
-  location String?
-  website  String?
-
-  characters Character[]
+  accounts          Account[]
+  sessions          Session[]
+  Post              Post[]
+  Comment           Comment[]
+  CommentVote       CommentVote[]
+  createdRaidTeams  RaidTeam[]
+  applications      Application[]
+  characters        Character[]
 }
 
 model Game {
@@ -97,17 +77,16 @@ model Game {
 model Subreddit {
   id          String         @id @default(cuid())
   name        String         @unique
-  game        Game?          @relation(fields: [gameId], references: [id])
   gameId      String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  posts       Post[] // Detailed guides or discussions specific to the game/topic
   description String?
   creatorId   String?
+  game        Game?          @relation(fields: [gameId], references: [id])
+  posts       Post[]
   creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
   subscribers Subscription[]
-
-  tags Tag[]
+  tags        Tag[]
 
   @@index([name])
   @@index([gameId])
@@ -115,10 +94,10 @@ model Subreddit {
 }
 
 model Subscription {
-  user        User      @relation(fields: [userId], references: [id])
   userId      String
-  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
+  user        User      @relation(fields: [userId], references: [id])
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
 
   @@id([userId, subredditId])
   @@index([subredditId])
@@ -130,37 +109,34 @@ model Post {
   content     Json?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  author      User      @relation(fields: [authorId], references: [id])
   authorId    String
-  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
+  slug        String?   @unique
+  description String?
+  author      User      @relation(fields: [authorId], references: [id])
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   comments    Comment[]
   votes       Vote[]
   postTags    PostTag[]
-  slug        String?   @unique
-  tags        Tag[]     @relation("PostToTag") // Change this line
-  description String?
-  // Remove the Tag and tagId fields
+  tags        Tag[]     @relation("PostToTag")
 
   @@index([authorId])
   @@index([subredditId])
 }
 
 model Comment {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   text      String
-  createdAt DateTime @default(now())
-  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime      @default(now())
   authorId  String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-
   replyToId String?
-  replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  replies   Comment[] @relation("ReplyTo")
-
-  votes     CommentVote[]
   commentId String?
+  author    User          @relation(fields: [authorId], references: [id])
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  replyTo   Comment?      @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[]     @relation("ReplyTo")
+  votes     CommentVote[]
 
   @@index([authorId])
   @@index([postId])
@@ -168,22 +144,22 @@ model Comment {
 }
 
 model Vote {
-  user   User     @relation(fields: [userId], references: [id])
   userId String
-  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
   type   VoteType
+  user   User     @relation(fields: [userId], references: [id])
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
   @@index([postId])
 }
 
 model CommentVote {
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String
   type      VoteType
+  user      User     @relation(fields: [userId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@id([userId, commentId])
   @@index([userId])
@@ -193,25 +169,24 @@ model CommentVote {
 model Tag {
   id          String     @id @default(cuid())
   name        String
-  subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
+  gameId      String?
   subredditId String?
+  subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
   posts       Post[]     @relation("PostToTag")
   game        Game?      @relation(fields: [gameId], references: [id])
-  gameId      String?
   postTag     PostTag[]
 
   @@index([subredditId])
   @@index([gameId])
 }
 
-// New model to represent the many-to-many relationship
 model PostTag {
-  post   Post   @relation(fields: [postId], references: [id])
   postId String
-  tag    Tag    @relation(fields: [tagId], references: [id])
   tagId  String
+  post   Post   @relation(fields: [postId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
 
-  @@id([postId, tagId]) // Composite primary key
+  @@id([postId, tagId])
   @@index([tagId])
 }
 
@@ -231,8 +206,7 @@ model Screenshot {
   url       String
   createdAt DateTime @default(now())
   caption   String?  @db.Text
-
-  video Video @relation(fields: [videoId], references: [videoid], onDelete: Cascade)
+  video     Video    @relation(fields: [videoId], references: [videoid], onDelete: Cascade)
 
   @@index([videoId])
 }
@@ -250,10 +224,9 @@ model Video {
 model Summary {
   id         String   @id @default(cuid())
   videoid    String
-  summary    String   @db.Text // Use Text for potentially long summaries
+  summary    String   @db.Text
   updated_at DateTime @default(now())
-
-  video Video @relation(fields: [videoid], references: [videoid], onDelete: Cascade)
+  video      Video    @relation(fields: [videoid], references: [videoid], onDelete: Cascade)
 
   @@index([videoid])
 }
@@ -262,7 +235,6 @@ model RaidTeam {
   id              String        @id @default(cuid())
   name            String
   about           String        @db.Text
-  aboutDetailed   String?       @db.Text
   schedule        String
   roles           Json
   progress        String
@@ -273,9 +245,9 @@ model RaidTeam {
   creatorId       String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  aboutDetailed   String?       @db.Text
   applications    Application[]
-
-  creator User @relation(fields: [creatorId], references: [id])
+  creator         User          @relation(fields: [creatorId], references: [id])
 
   @@index([creatorId])
 }
@@ -293,9 +265,8 @@ model Application {
   status         ApplicationStatus @default(PENDING)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
-
-  applicant User     @relation(fields: [applicantId], references: [id])
-  team      RaidTeam @relation(fields: [teamId], references: [id])
+  applicant      User              @relation(fields: [applicantId], references: [id])
+  team           RaidTeam          @relation(fields: [teamId], references: [id])
 
   @@index([applicantId])
   @@index([teamId])
@@ -307,9 +278,97 @@ model Character {
   class     String
   spec      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model ItemClass {
+  id           Int            @id
+  name         String
+  items        Item[]
+  ItemSubClass ItemSubClass[]
+}
+
+model ItemSubClass {
+  id          Int       @id
+  name        String
+  itemClassId Int
+  itemClass   ItemClass @relation(fields: [itemClassId], references: [id])
+  items       Item[]
+
+  @@index([itemClassId])
+}
+
+model Item {
+  id             Int           @id
+  name           String
+  description    String        @db.Text
+  itemClassId    Int
+  itemClass      ItemClass     @relation(fields: [itemClassId], references: [id])
+  expansion      Int? // Add this line
+  quality        String? // Add this line
+  level          Int? // Add this line
+  requiredLevel  Int? // Add this line
+  itemSubClassId Int? // Add this line
+  inventoryType  String? // Add this line
+  ItemSubClass   ItemSubClass? @relation(fields: [itemSubClassId], references: [id])
+  Spell          Spell[]
+  Creature       Creature?     @relation(fields: [creatureId], references: [id])
+  creatureId     Int?
+  Achievement    Achievement?  @relation(fields: [achievementId], references: [id])
+  achievementId  Int?
+
+  @@index([itemClassId])
+  @@index([itemSubClassId])
+  @@index([creatureId])
+  @@index([achievementId])
+}
+
+model Spell {
+  id          Int    @id
+  name        String
+  description String
+  itemId      Int?
+  item        Item?  @relation(fields: [itemId], references: [id])
+
+  @@index([itemId])
+}
+
+model Creature {
+  id           Int     @id
+  name         String
+  creatureType String?
+  level        Int?
+  droppedItems Item[]
+}
+
+model Achievement {
+  id          Int    @id
+  name        String
+  description String
+  points      Int
+  rewardItems Item[]
+}
+
+model PostToTag {
+  A String
+  B String
+
+  @@unique([A, B], map: "_PostToTag_AB_unique")
+  @@index([B], map: "_PostToTag_B_index")
+  @@map("_PostToTag")
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  DECLINED
 }

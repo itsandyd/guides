@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "fetch-blizzard-items": "ts-node src/scripts/fetchBlizzardItems.ts",
+    "enhance": "ts-node src/scripts/enhance.ts"
   },
   "dependencies": {
     "@editorjs/code": "^2.8.0",
@@ -51,11 +53,13 @@
     "autoprefixer": "10.4.14",
     "aws-sdk": "^2.1642.0",
     "axios": "^1.6.0",
+    "blizzard.js": "^4.5.0",
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^2.2.0",
     "clsx": "^2.1.1",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.4.5",
     "editorjs-react-renderer": "^3.5.1",
     "embla-carousel-react": "^8.1.5",
     "eslint": "8.41.0",
@@ -70,7 +74,7 @@
     "next-auth": "^4.22.1",
     "next-themes": "^0.3.0",
     "novel": "^0.1.22",
-    "openai": "^4.52.3",
+    "openai": "^4.61.0",
     "postcss": "8.4.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -97,6 +101,7 @@
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
     "prisma": "^5.15.0",
+    "tsx": "^4.19.1",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^9.4.0"
   }
