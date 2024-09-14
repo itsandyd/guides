@@ -65,11 +65,11 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const pathname = usePathname()
 
-  const { data: existingPost } = useQuery(
+  const { data: existingPost, isLoading: isPostLoading } = useQuery(
     ['post', postId],
     () => axios.get(`/api/subreddit/post/${postId}`).then((res) => res.data),
     {
-      enabled: isEditing,
+      enabled: !!postId,
       onSuccess: (data) => {
         if (data) {
           setValue('title', data.title);
@@ -217,14 +217,14 @@ export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initi
   }, [isMounted, initializeEditor, editorInstance])
 
   useEffect(() => {
-    if (initialData) {
-      setValue('title', initialData.title);
+    if (existingPost && !isPostLoading) {
+      setValue('title', existingPost.title);
       if (editorInstance) {
-        editorInstance.render(initialData.content);
+        editorInstance.render(existingPost.content);
       }
-      setSelectedTags(initialData.tags);
+      setSelectedTags(existingPost.tags);
     }
-  }, [initialData, setValue, editorInstance]);
+  }, [existingPost, isPostLoading, setValue, editorInstance]);
 
   const handleTagSelect = (tagId: string) => {
     const tag = availableTags.find((t: { id: string }) => t.id === tagId);

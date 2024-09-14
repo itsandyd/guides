@@ -64,7 +64,6 @@ const EditPostPage = async ({ params }: EditPageProps) => {
         tags={formattedTags} 
         guideSlug={params.slug}
         postId={params.postId}
-        initialData={post}
       />
 
       <div className='w-full flex justify-end'>
