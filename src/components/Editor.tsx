@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/Command'
 import { Button } from '@/components/ui/Button'
+import { useUser } from '@clerk/nextjs'
 
 type FormData = z.infer<typeof PostValidator>
 
@@ -33,6 +34,7 @@ interface EditorProps {
 }
 
 export const Editor: React.FC<EditorProps> = ({ subredditId, tags, postId, initialData, guideSlug }) => {
+  const { user } = useUser()
   const params = useParams()
   const isEditing = !!postId;
 

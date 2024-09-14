@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthSession } from '@/lib/auth'
+import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 
 export async function DELETE(
@@ -7,9 +7,9 @@ export async function DELETE(
   { params }: { params: { postId: string } }
 ) {
   try {
-    const session = await getAuthSession()
+    const { userId } = auth()
 
-    if (!session?.user) {
+    if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
@@ -22,7 +22,7 @@ export async function DELETE(
       return new NextResponse('Post not found', { status: 404 })
     }
 
-    if (post.authorId !== session.user.id) {
+    if (post.authorId !== userId) {
       return new NextResponse('Forbidden', { status: 403 })
     }
 

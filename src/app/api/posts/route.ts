@@ -1,18 +1,17 @@
-import { getAuthSession } from '@/lib/auth'
+import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
-
-  const session = await getAuthSession()
+  const { userId } = auth()
 
   let followedCommunitiesIds: string[] = []
 
-  if (session) {
+  if (userId) {
     const followedCommunities = await db.subscription.findMany({
       where: {
-        userId: session.user.id,
+        userId: userId,
       },
       include: {
         subreddit: true,
@@ -43,7 +42,7 @@ export async function GET(req: Request) {
           name: subredditName,
         },
       }
-    } else if (session) {
+    } else if (userId) {
       whereClause = {
         subreddit: {
           id: {
@@ -55,7 +54,7 @@ export async function GET(req: Request) {
 
     const posts = await db.post.findMany({
       take: parseInt(limit),
-      skip: (parseInt(page) - 1) * parseInt(limit), // skip should start from 0 for page 1
+      skip: (parseInt(page) - 1) * parseInt(limit),
       orderBy: {
         createdAt: 'desc',
       },
