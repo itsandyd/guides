@@ -1,10 +1,21 @@
 import { auth } from '@clerk/nextjs/server'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
-  const { userId } = auth()
+  
+  // Try to get user from Clerk
+  const { userId: clerkUserId } = auth()
+  
+  // Try to get user from NextAuth
+  const session = await getServerSession(authOptions)
+  const nextAuthUserId = session?.user?.id
+
+  // Use Clerk userId if available, otherwise use NextAuth userId
+  const userId = clerkUserId || nextAuthUserId
 
   let followedCommunitiesIds: string[] = []
 

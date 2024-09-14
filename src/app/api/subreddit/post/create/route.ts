@@ -1,4 +1,6 @@
-import { getAuthSession } from '@/lib/auth'
+import { auth } from '@clerk/nextjs/server'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
 import { db } from '@/lib/db'
 import { PostValidator } from '@/lib/validators/post'
 import { z } from 'zod'
@@ -6,9 +8,17 @@ import { generateSlug } from '@/lib/utils'
 
 export async function POST(req: Request) {
   try {
-    const session = await getAuthSession()
+    // Try to get user from Clerk
+    const { userId: clerkUserId } = auth()
+    
+    // Try to get user from NextAuth
+    const session = await getServerSession(authOptions)
+    const nextAuthUserId = session?.user?.id
 
-    if (!session?.user) {
+    // Use Clerk userId if available, otherwise use NextAuth userId
+    const userId = clerkUserId || nextAuthUserId
+
+    if (!userId) {
       return new Response('Unauthorized', { status: 401 })
     }
 
@@ -18,7 +28,7 @@ export async function POST(req: Request) {
     const subscriptionExists = await db.subscription.findFirst({
       where: {
         subredditId,
-        userId: session.user.id,
+        userId,
       },
     })
 
@@ -49,7 +59,7 @@ export async function POST(req: Request) {
       data: {
         title,
         content,
-        authorId: session.user.id,
+        authorId: userId,
         subredditId,
         slug,
       },
