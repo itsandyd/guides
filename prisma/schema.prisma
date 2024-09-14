@@ -112,7 +112,7 @@ model Post {
   authorId    String
   subredditId String
   slug        String?   @unique
-  description String?
+  description String?   @db.Text // Change this line
   author      User      @relation(fields: [authorId], references: [id])
   subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   comments    Comment[]
